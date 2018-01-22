@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<body>
+	<timeList>
+		<timeItem>0600</timeItem>
+		<timeItem>0630</timeItem>
+		<timeItem>0710</timeItem>
+		<timeItem>0810</timeItem>
+		<timeItem>0850</timeItem>
+		<timeItem>0930</timeItem>
+		<timeItem>1030</timeItem>
+		<timeItem>1110</timeItem>
+		<timeItem>1150</timeItem>
+		<timeItem>1250</timeItem>
+		<timeItem>1330</timeItem>
+		<timeItem>1410</timeItem>
+		<timeItem>1510</timeItem>
+		<timeItem>1550</timeItem>
+		<timeItem>1630</timeItem>
+		<timeItem>1730</timeItem>
+		<timeItem>1850</timeItem>
+		<timeItem>1950</timeItem>
+		<timeItem>2030</timeItem>
+		<timeItem>2100</timeItem>
+	</timeList>
+</body>

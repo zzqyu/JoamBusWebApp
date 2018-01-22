@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<body>
+	
+	<!--
+	type
+	1: 시간표1개 상, 동일
+	2: 시간표2개 상, 평주말
+	3: 시간표2개 상하행, 동일
+	4: 시간표4개 상하, 평주말
+	-->
+		<routeTimeType><!--8155-->
+			<routeId>233000139</routeId>
+			<type>4</type>
+		</routeTimeType>
+		<routeTimeType><!--9801-->
+			<routeId>241005320</routeId>
+			<type>3</type>
+		</routeTimeType>
+		<routeTimeType><!--9802-->
+			<routeId>241005300</routeId>
+			<type>3</type>
+		</routeTimeType>
+		<routeTimeType><!--50-1-->
+			<routeId>241483004</routeId>
+			<type>4</type>
+		</routeTimeType>
+		<routeTimeType><!--50-1대광-->
+			<routeId>241483010</routeId>
+			<type>4</type>
+		</routeTimeType>
+		
+	
+</body>

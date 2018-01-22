@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<body>
+	<timeList>
+		<timeItem>0715</timeItem>
+		<timeItem>0900</timeItem>
+		<timeItem>1100</timeItem>
+		<timeItem>1400</timeItem>
+		<timeItem>1600</timeItem>
+		<timeItem>1900</timeItem>
+	</timeList>
+</body>

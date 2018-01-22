@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  
+  <servlet>
+    <servlet-name>main</servlet-name>
+    <servlet-class>joambuswebapp.MainServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>main</servlet-name>
+    <url-pattern>/main</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>routeinfo</servlet-name>
+    <servlet-class>joambuswebapp.BusRouteInfoServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>routeinfo</servlet-name>
+    <url-pattern>/routeinfo</url-pattern>
+  </servlet-mapping> 
+  <servlet>
+    <servlet-name>timeinfo</servlet-name>
+    <servlet-class>joambuswebapp.TimetableServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>timeinfo</servlet-name>
+    <url-pattern>/timeinfo</url-pattern>
+  </servlet-mapping>
+</web-app>
