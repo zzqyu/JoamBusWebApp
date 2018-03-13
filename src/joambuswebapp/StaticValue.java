@@ -25,6 +25,7 @@ public class StaticValue {
 	public final static String URL_GET_BUS_ROUTE_INFO_ITEM = "/busrouteservice/info";
 	public final static String URL_GET_BUS_ROUTE_STATION_LIST = "/busrouteservice/station";
 	public final static String URL_GET_BUS_LOCATION_LIST = "/buslocationservice";
+	public final static String URL_GET_BUS_STATION_ARRIVE_LIST = "/busarrivalservice/station";
 	public final static String PUBLIC_SERVICE_KEY = "?serviceKey=1234567890";
 	public final static String PRIVATE_SERVICE_KEY = "?serviceKey=zRuxSFejoJKPbOZdUuxyIUWJF7R56lxvA5LbRwxQWj8IVxCG2F6aYImQvUJIdzvjM3EDvvYQfrQyIirNaYWkqA%3D%3D";
 	public final static String SERVICE_KEY = PRIVATE_SERVICE_KEY;
@@ -38,6 +39,15 @@ public class StaticValue {
     		"    </ins>\r\n" + 
     		"</div>" + 
 			"<script type=\"text/javascript\" src=\"//t1.daumcdn.net/adfit/static/ad.min.js\"></script>";
+    
+    public final static String[] MAIN_SERVLET_TABLE_TAGS = {"routeName","routeId","startStationName","middleStationName","endStationName", "routeTypeCd", "isOneWay"};
+    public final static String[] ROUTEINFO_SERVLET_STATION_LIST_TAG = {"centerYn", "mobileNo", "regionName", "stationId", "stationName", "x", "y", "stationSeq", "turnYn"};
+    public final static String[] ROUTEINFO_SERVLET_ROUTEINFO_TAG = {"routeTypeCd", "startStationName", "endStationName", "routeName", "upFirstTime", "downFirstTime", "upLastTime", "downLastTime"};
+    public final static String[] STATIONINFO_SERVLET_ROUTEINFO_TAG = {"routeName", "routeId", "startStationName", "middleStationName", "endStationName", "routeTypeCd", "isOneWay"};
+    public final static String ROUTE_INFO_TABLE_NAME = "routeInfo";
+    public final static String STATION_OF_ROUTE_TABLE_NALE = "routestation";
+    public final static String JOAMBUS_DB_NAME = "joambusdb";
+    
 	
 	public static String RouteTypeToColorName(String routeType)
     {

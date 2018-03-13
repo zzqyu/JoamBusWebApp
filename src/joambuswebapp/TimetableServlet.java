@@ -56,7 +56,7 @@ public class TimetableServlet extends HttpServlet {
 				"  <meta charset=\"utf-8\">" + 
 				"<meta name=\"robots\" content=\"noindex\">" + 
 				"  <meta name=\"viewport\" content=\"width=device-width\">" + 
-				"  <title>시간표</title>" + 
+				"  <title>조암버스:시간표</title>" + "<link rel=\"shortcut icon\" href=\"/drawable/favicon.ico\">"+
 				//css start
 				"<style>" + 
 				"@import url(//fonts.googleapis.com/earlyaccess/jejugothic.css); " + 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
@@ -28,8 +29,8 @@ public class MainServlet extends HttpServlet{
 				"  <meta charset=\"UTF-8\">" + 
 				"<meta name=\"robots\" content=\"noindex\">" + 
 				"  <meta name=\"viewport\" content=\"width=device-width\">" + 
-				"  <title>조암버스</title>" + 
-				"" + 
+				"  <title>조암버스:홈</title>" + 
+				"<link rel=\"shortcut icon\" href=\"/drawable/favicon.ico\">" + 
 				"<style id=\"jsbin-css\">" + 
 				"@import url(//fonts.googleapis.com/earlyaccess/jejugothic.css);\r\n" + 
 				"body { font-family: 'Jeju Gothic', sans-serif;}"+
@@ -76,12 +77,44 @@ public class MainServlet extends HttpServlet{
 				"<div style=\"position: static;padding-top:58px;padding-bottom:58px;\">"+
 				"<ul>");
 		try {
-			//new MakeXml();
-			ArrayList<RouteInfoItem> routeItemList =  StaticValue.getRouteInfoItem(StaticValue.routeLocalization(), req);
+			DBManager dbm = new DBManager(StaticValue.JOAMBUS_DB_NAME); 
+			String[] tags =  StaticValue.MAIN_SERVLET_TABLE_TAGS;
+			ArrayList<HashMap<String, String>> routeItemList=dbm.getDBDataList(StaticValue.ROUTE_INFO_TABLE_NAME, tags, tags[0], false, null, null);
+			routeItemList.sort((x, y) -> new Float (Float.parseFloat(x.get("routeName").replace('-', '.').replaceAll("[^0-9.]", "")))
+		            .compareTo(Float.parseFloat(y.get("routeName").replace('-', '.').replaceAll("[^0-9.]", ""))));
+			/*
+			for (HashMap<String, String> row:answer) {
+				for(String tag: tags) 
+					System.out.print(row.get(tag)+"\t");
+				System.out.println();
+			}
+			ArrayList<RouteInfoItem> routeItemList =  StaticValue.getRouteInfoItem(StaticValue.routeLocalization(), req);*/
 			out.print("<p>");
+			for (HashMap<String, String> row:routeItemList) {
+				String direction = "<=>";
+				if (row.get("isOneWay").equals("Y")) direction = "=>";
+				
+				out.print("<li>\r\n" + 
+						"      <a href=\"routeinfo?routeId="+row.get("routeId")+"\">\r\n" + 
+						"      <table>\r\n" + 
+						"        <tr>\r\n" + //https://joambusapp.azurewebsites.net/
+						"          <td rowspan=2><img width=\"40px\"src=\"drawable/bus_"+
+						StaticValue.RouteTypeToColorName(row.get("routeTypeCd")).toLowerCase()+".PNG\"/></td>\r\n" + 
+						"          <td rowspan=2 id=\"r_name\">"+row.get("routeName")+"</td>\r\n" + 
+						"          <td id=\"r_start_sta\">"+row.get("startStationName").split("[.(]")[0]+direction+row.get("middleStationName").split("[.(]")[0]+"</td>\r\n" + 
+						"        </tr>\r\n" + 
+						"        <tr>\r\n" + 
+						"          <td id=\"r_end_sta\">"+direction+row.get("endStationName").split("[.(]")[0]+"</td>\r\n" + 
+						"        </tr>\r\n" + 
+						"      </table>\r\n" + 
+						"      </a>\r\n" + 
+						"    </li>");
+				
+			}
+			/*
 			for(RouteInfoItem routeItem:routeItemList) {
 				//System.out.println("routeId :"+ s.getRouteId());
-				/*https://joambusapp.azurewebsites.net*/
+				//https://joambusapp.azurewebsites.net
 				out.print("<li>\r\n" + 
 						"      <a href=\"routeinfo?routeId="+routeItem.getRouteId()+"\">\r\n" + 
 						"      <table>\r\n" + 
@@ -99,15 +132,11 @@ public class MainServlet extends HttpServlet{
 						"    </li>");
 				
 			}
+		*/
 			out.print("</p>");
 			out.print("</ul>" +"</div>"+StaticValue.AD+"</body>" + 
 					"</html>");
-		} catch (SocketTimeoutException e) {
-			System.out.println("실패!");
-			e.printStackTrace();
-			resp.sendRedirect("/gbis_error.html");
-			return ;
-		}catch(Exception e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 			resp.sendRedirect("/error.html");
 			return ;

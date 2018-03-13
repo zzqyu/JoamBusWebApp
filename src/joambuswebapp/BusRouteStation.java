@@ -68,6 +68,17 @@ public class BusRouteStation {
 	public String getTurnYn() {
 		return turnYn;
 	}
+	public String toString() {
+		return  centerYn + "\t" +
+		 mobileNo + "\t" +
+		 regionName+ "\t" +
+		 stationId+ "\t" +
+		 stationName+ "\t" +
+		 gpsX+ "\t" +
+		 gpsY+ "\t" +
+		 stationSeq+ "\t" +
+		 turnYn+ "\t";
+	}
 
 	public static ArrayList<BusRouteStation> getRouteStationList(String routeId) throws Exception {
 		ArrayList<BusRouteStation> result = new ArrayList<BusRouteStation>();

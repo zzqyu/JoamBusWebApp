@@ -18,6 +18,14 @@
     <url-pattern>/routeinfo</url-pattern>
   </servlet-mapping> 
   <servlet>
+    <servlet-name>routeinfo2</servlet-name>
+    <servlet-class>joambuswebapp.BusRouteInfoServlet2</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>routeinfo2</servlet-name>
+    <url-pattern>/routeinfo2</url-pattern>
+  </servlet-mapping> 
+  <servlet>
     <servlet-name>timeinfo</servlet-name>
     <servlet-class>joambuswebapp.TimetableServlet</servlet-class>
   </servlet>
@@ -25,4 +33,12 @@
     <servlet-name>timeinfo</servlet-name>
     <url-pattern>/timeinfo</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>stationinfo</servlet-name>
+    <servlet-class>joambuswebapp.StationInfoServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>stationinfo</servlet-name>
+    <url-pattern>/stationinfo</url-pattern>
+  </servlet-mapping> 
 </web-app>
