@@ -72,6 +72,11 @@ public class BusRouteInfoServlet extends HttpServlet {
 			tts = temp;
 		}
 		PrintWriter out = response.getWriter();
+		if(routeId.equals("241483004")) {
+			out.print("<!DOCTYPE html><html><body><script>" 
+					+ "location.href='/routeinfo.jsp?routeId=241483004';"
+					+ "</script></body></html>");
+		}
 		out.print("<!DOCTYPE html>" + "<html>" + "<head>" + "  <meta charset=\"utf-8\">"
 				+ "<meta name=\"robots\" content=\"noindex\">"
 				+ "  <meta name=\"viewport\" content=\"width=device-width\">" + "  <title>조암버스:"+routeInfoItem.get("routeName")+"번 노선정보</title>"

@@ -1,0 +1,103 @@
+@charset "UTF-8";
+@import url(//fonts.googleapis.com/earlyaccess/jejugothic.css);
+
+body {
+	font-family: 'Jeju Gothic', sans-serif;
+}
+
+body {
+	margin: 0px;
+}
+
+#info_and_time {
+	background-color: #fcb814;
+	text-align: center;
+	color: white;
+	line-height: 45%;
+	padding: 1px;
+	padding-top: 55px;
+	padding-bottom: 15px;
+}
+
+#subtitle {
+	font-size: 125%
+}
+
+#time {
+	font-size: 150%
+}
+
+ul {
+	margin: 5px;
+	list-style: none;
+	padding-left: 0px;
+	margin-bottom: 58px;
+	background-color: #cccccc;
+}
+
+li:hover {
+	background-color: #ffbdbd;
+}
+
+li {
+	height: 56px;
+	margin-bottom: 1px;
+	background-color: #ffffff;
+	line-height: 90%;
+}
+
+a {
+	display: block;
+	text-decoration: none;
+}
+
+#sta_name, #sta_mbno {
+	position: absolute;
+	color: #333333;
+}
+
+#sta_name {
+	padding-top: 5px;
+	padding-left: 8px;
+	font-size: 110%
+}
+
+#sta_mbno {
+	padding-left: 10px;
+	font-size: 90%
+}
+
+#sta_property_box {
+	position: relative;
+	float: right;
+}
+
+#bus_property_box {
+	font-size: 72%;
+	float: left;
+	margin-top: 20px;
+	color: black;
+}
+
+#seat {
+	float: right;
+}
+
+#car_no {
+	float: bottom;
+}
+
+#bus_loca_indi_box {
+	float: right;
+}
+
+#sta_img {
+	position: relative;
+	float: right;
+	height: 56px
+}
+
+#sta_arr_img {
+	position: absolute;
+	margin: 6px;
+	height: 44px;

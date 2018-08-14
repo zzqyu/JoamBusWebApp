@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <body>
 	<timeList>
-		<timeItem>0720</timeItem>
-		<timeItem>0920</timeItem>
-		<timeItem>1120</timeItem>
-		<timeItem>1420</timeItem>
-		<timeItem>1620</timeItem>
+		<timeItem>0830</timeItem>
+		<timeItem>1030</timeItem>
+		<timeItem>1130</timeItem>
+		<timeItem>1330</timeItem>		<timeItem>1530</timeItem>		<timeItem>1630</timeItem>
 	</timeList>
 </body>

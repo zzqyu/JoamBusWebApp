@@ -1,13 +1,21 @@
 package joambuswebapp;
 
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.SQLException;
+import java.sql.Time;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,13 +40,14 @@ public class StaticValue {
 	public final static String SERVER_URL = "https://joambusapp.azurewebsites.net";
     public final static String SERVER_URL_TIME = "/routetime";
     public final static String SERVER_URL_APP = "/appfile";
-    public final static String AD = "<div style=\"position:fixed;z-index: 3; background:#ffffff; padding-top:12px; bottom:0px;left:0px;width:100%;\">\r\n" + 
+    public final static String AD = "<div style=\"position:fixed;z-index: 3; background:#192231; padding-top:12px; bottom:0px;left:0px;width:100%;\">\r\n" + 
     		"	<ins id=\"name\" class=\"daum_ddn_area\" data-ad-unit=\"DAN-tol7l6smt92u\" data-ad-media=\"5l5\" data-ad-pubuser=\"l7\" data-ad-type=\"A\" data-ad-width=\"320\" data-ad-height=\"50\" data-ad-onfail=\"callBackFunc\" data-ad-init=\"done\" data-ad-status=\"done\" data-viewable-checker-id=\"I6C5Si\">\r\n" + 
     		"		 <iframe name=\"easyXDM_default7856_provider\" id=\"name_ifrm\" marginwidth=\"0\" marginheight=\"0\" frameborder=\"0\" width=\"100%\" height=\"50\" scrolling=\"no\" src=\"https://display.ad.daum.net/sdk/web?slotid=DAN-tol7l6smt92u&amp;amp;surl=https%3A%2F%2Fjoambusapp.azurewebsites.net%2Fmain&amp;amp;eid=name&amp;amp;containerid=name#xdm_e=https%3A%2F%2Fjoambusapp.azurewebsites.net&amp;amp;xdm_c=default7856&amp;amp;xdm_p=1\" style=\"display: block; border: 0px; margin: 0px auto; min-width: 320px; min-height: 50px;\">\r\n" + 
     		"        </iframe>\r\n" + 
     		"    </ins>\r\n" + 
     		"</div>" + 
 			"<script type=\"text/javascript\" src=\"//t1.daumcdn.net/adfit/static/ad.min.js\"></script>";
+    
     
     public final static String[] MAIN_SERVLET_TABLE_TAGS = {"routeName","routeId","startStationName","middleStationName","endStationName", "routeTypeCd", "isOneWay"};
     public final static String[] ROUTEINFO_SERVLET_STATION_LIST_TAG = {"centerYn", "mobileNo", "regionName", "stationId", "stationName", "x", "y", "stationSeq", "turnYn"};
@@ -47,6 +56,7 @@ public class StaticValue {
     public final static String ROUTE_INFO_TABLE_NAME = "routeInfo";
     public final static String STATION_OF_ROUTE_TABLE_NALE = "routestation";
     public final static String JOAMBUS_DB_NAME = "joambusdb";
+    public final static String ARRIVAL_TIME_DB_NAME = "busarrivaldb";
     
 	
 	public static String RouteTypeToColorName(String routeType)
@@ -166,6 +176,14 @@ public class StaticValue {
 		int i = -1;
 		for(i = 0; i<as.size(); i++) {
 			if(Integer.parseInt(as.get(i))>Integer.parseInt(s))
+				break;
+		}
+		return i;
+	}
+	public static int findTimeIndex2(ArrayList<ArrayList<Object>> as, Time s) {
+		int i = -1;
+		for(i = 0; i<as.size(); i++) {
+			if(((Time)as.get(i).get(0)).compareTo(s)==1)
 				break;
 		}
 		return i;
@@ -304,4 +322,97 @@ public class StaticValue {
 		}
 		return false;
 	}
+	@SuppressWarnings("deprecation")
+	public static ArrayList<Time> timetableOfRouteInStation(String route, String stationId, boolean isrouteId){
+		ArrayList<Time> timeList = new ArrayList<>();
+		ArrayList<Time> answer = new ArrayList<>();
+		HashMap<Integer, Integer> countOfListSize = new HashMap<>();
+		
+		String routeTag = isrouteId?"routeID":"routeNo";
+		
+		DBManager dbm = new DBManager(ARRIVAL_TIME_DB_NAME);
+		try {
+			for(String tableName : dbm.tableList()) {
+				ArrayList<HashMap<String, String>> dateTimetable = dbm.getDBDataList(tableName, new String[] {"arrTime"}, "arrTime", true, new String[] {routeTag, "stationID"}, new String[] {route, stationId});
+				if(dateTimetable == null) {
+					System.out.println("!!");
+					continue; 
+				}
+				//날짜별 시간표 사이즈 개수 수집
+				int timetableSize = dateTimetable.size();
+				if(timetableSize!=0) {
+					if(!countOfListSize.containsKey(timetableSize))
+						countOfListSize.put(timetableSize, 1);
+					else
+						countOfListSize.put(timetableSize, countOfListSize.get(timetableSize)+1);
+					
+					for (HashMap<String, String> row: dateTimetable) {
+						String[] strTime = (row.get("arrTime")).split("[:.]"); //HH:mm:ss.000000
+						timeList.add(new Time(Integer.parseInt(strTime[0]), Integer.parseInt(strTime[1]), Integer.parseInt(strTime[2])));
+					}
+				}
+			
+			}
+			if (countOfListSize.isEmpty())
+				return null;
+			
+			StaticGMethod<Integer> sm = new StaticGMethod<>();
+			countOfListSize = sm.sortByValue(countOfListSize, true);
+			
+			timeList.sort((x, y) -> x.compareTo(y));
+			
+			int div = (int)countOfListSize.keySet().toArray()[0];
+			float gap = timeList.size()/div;
+			float startIndex = gap/2;
+			float index = startIndex;
+			while (index < timeList.size()) {
+				answer.add(timeList.get(Math.round(index)));
+				index+=gap;
+			}
+
+			
+			
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return answer;
+		//ArrayList<HashMap<String, String>> a = dbm.getDBDataList(tableName, tagTitles, criteriaTag, isInc, conditionTags, conditionValue)
+	}
+	
+	public static ArrayList<ArrayList<Object>> timetableOfStation(String stationId){
+		DBManager dbm = new DBManager(JOAMBUS_DB_NAME);
+		ArrayList<ArrayList<Object>> timetable = new ArrayList<>();
+		try {
+			ArrayList<HashMap<String, String>> routeItemList=dbm.getDBDataList(StaticValue.STATION_OF_ROUTE_TABLE_NALE, new String[] {"routeId"}, "routeId", false, new String[] {"stationId"}, new String[] {stationId});
+			for(HashMap<String, String> row : routeItemList) {
+				String routeNo = dbm.getDBDataList(StaticValue.ROUTE_INFO_TABLE_NAME, new String[] {"routeName"}, "routeName", false, new String[] {"routeId"}, new String[] {row.get("routeId")}).get(0).get("routeName");
+				if(routeNo.contains("50-1") || routeNo.equals("28")|| routeNo.equals("8155")) continue;
+				for(Time t: timetableOfRouteInStation(routeNo, stationId, false)) {
+					ArrayList<Object> timetableRow = new ArrayList<>();
+					timetableRow.add(t);
+					timetableRow.add(routeNo);
+					timetable.add(timetableRow);
+				}
+			}
+			timetable.sort((x, y) -> ((Time)x.get(0)).compareTo((Time)y.get(0)));
+			/*
+			for(ArrayList<Object> row : timetable) {
+				System.out.println( (Time)row.get(0) + "\t" +   (String)row.get(1));
+			}*/
+			return timetable;
+		
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			return null;
+		}
+		
+	}
+		
+
 }

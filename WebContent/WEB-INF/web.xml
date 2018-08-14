@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
-  
-  <servlet>
+  	<servlet>
+		<servlet-name>main</servlet-name>
+		<jsp-file>/main.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>main</servlet-name>
+		<url-pattern>/main</url-pattern>
+	</servlet-mapping>
+  <!-- <servlet>
     <servlet-name>main</servlet-name>
     <servlet-class>joambuswebapp.MainServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>main</servlet-name>
     <url-pattern>/main</url-pattern>
-  </servlet-mapping>
+  </servlet-mapping> -->
   <servlet>
     <servlet-name>routeinfo</servlet-name>
     <servlet-class>joambuswebapp.BusRouteInfoServlet</servlet-class>
@@ -32,6 +39,14 @@
   <servlet-mapping>
     <servlet-name>timeinfo</servlet-name>
     <url-pattern>/timeinfo</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>timeinfo2</servlet-name>
+    <servlet-class>joambuswebapp.TimetableServlet2</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>timeinfo2</servlet-name>
+    <url-pattern>/timeinfo2</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>stationinfo</servlet-name>

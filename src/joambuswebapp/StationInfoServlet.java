@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -119,7 +120,7 @@ public class StationInfoServlet extends HttpServlet {
 				"        <a href=\"index.html\" style=\"position:absolute;top:20px;left:10px;\">\r\n" + 
 				"            <img src=\"/drawable/home.png\" />\r\n" + 
 				"		</a>\r\n" + 
-				"		<a href=\"/appfile/time.html\"style=\"position:absolute;top:20px;right:10px;\">\r\n" + 
+				"		<a href=\"/timeinfo2?stationId="+stationId+"&title="+stationName+"\"style=\"position:absolute;top:20px;right:10px;\">\r\n" + 
 				"            <img src=\"/drawable/time.png\" />\r\n" + 
 				"        </a>\r\n" + 
 				"    </div>");
@@ -200,6 +201,8 @@ public class StationInfoServlet extends HttpServlet {
 				System.out.println(row.get("routeId")+" 노선정보조회");
 				gbisRouteList.remove(row.get("routeId"));
 				HashMap<String, String> routeInfoItem = dbm.getDBDataList(StaticValue.ROUTE_INFO_TABLE_NAME, StaticValue.STATIONINFO_SERVLET_ROUTEINFO_TAG, StaticValue.STATIONINFO_SERVLET_ROUTEINFO_TAG[0], false, new String[] {"routeId"}, new String[] {row.get("routeId")}).get(0);
+
+				
 				String direction = "<=>";
 				if (routeInfoItem.get("isOneWay").equals("Y")) direction = "=>";
 				out.print("<li>\r\n" + 
@@ -249,7 +252,8 @@ public class StationInfoServlet extends HttpServlet {
 			// TODO: handle exception
 		}
 		out.print("</ul></div>");
-		out.print(StaticValue.AD+"</body>" + "</html>");
+		
+		
 	}
 	private ArrayList<String> stopByRouteList(String stationId) {
 		ArrayList<String> routeList = null;
@@ -283,4 +287,5 @@ public class StationInfoServlet extends HttpServlet {
 		}
 		return routeList;
 	}
+	
 }
