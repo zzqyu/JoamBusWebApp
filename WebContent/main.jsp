@@ -61,10 +61,10 @@
     <header id="menu" style="background-color: #494e6b;">
       <div class="container text-white text-center">
         <div class="row" style="padding:10px;">
-		    <div class="card bg-dark col-sm-6 col-lg-3" ><br><br>버스 요금표</div>
-		    <div class="card bg-dark text-gray col-sm-6 col-lg-3" ><br><br>정류장검색<br>-추후기능제공-</div>
-		    <div class="card bg-dark col-sm-6 col-lg-3" ><br><br>터미널 정보</div>
-		    <div class="card bg-dark col-sm-6 col-lg-3" ><br><br>홈페이지 정보</div>
+		    <a href="/appfile/buspay.html" class="card bg-dark col-6 col-sm-3" ><br><br>버스 요금표</a>
+		    <div class="card bg-dark text-gray col-6 col-sm-3" ><br><br>정류장검색<br>-추후 제공-</div>
+		    <div class="card bg-dark col-6 col-sm-3" ><br><br>터미널 정보<br>-추후 제공-</div>
+		    <a href="/appfile/hompageinfo.html" class="card bg-dark col-6 col-sm-3" ><br><br>홈페이지 정보</a>
 		</div>
       </div>
     </header>
@@ -75,7 +75,7 @@
     %>
     <%!
 	    String routeItemHtml(String[] s, int type){
-	    	String answer = "<a class='list-group-item list-group-item-action' href='https://joambusapp.azurewebsites.net/routeinfo?routeId="+ s[0] + "'>"
+	    	String answer = "<a class='list-group-item list-group-item-action' href='/routeinfo?routeId="+ s[0] + "'>"
 					+"<table><tbody><tr>"
 					+"<td rowspan='2'><img width='40px'"
 					+"		src='drawable/bus_"+StaticValue.RouteTypeToColorName(type+"").toLowerCase()+".PNG'></td>"

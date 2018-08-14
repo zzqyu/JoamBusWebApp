@@ -148,7 +148,7 @@ public class StationInfoServlet extends HttpServlet {
 					middleStationName = "";
 					endStationName = rii.getEndStationName();
 					direction = "-";
-					isInDB="2";
+					isInDB="";
 				}
 				else {
 					routeId = routeInfoItem.get(0).get("routeId");
@@ -222,7 +222,7 @@ public class StationInfoServlet extends HttpServlet {
 			for(String gbisRouteId: gbisRouteList) {
 				RouteInfoItem rii = StaticValue.getRouteInfoItem(new ArrayList<String>(Arrays.asList(new String[] {gbisRouteId})), request).get(0);
 				out.print("<li>\r\n" + 
-						"	<a href=\"routeinfo2?routeId="+gbisRouteId+"\">\r\n" +
+						"	<a href=\"routeinfo?routeId="+gbisRouteId+"\">\r\n" +
 						//"				<a href=\"http://m.gbis.go.kr/search/StationArrivalViaList.do?stationId=233000929\">\r\n" + 
 						"					<table style=\"display:inline\">\r\n" + 
 						"						<tr height=\"50px\">\r\n" + 

@@ -4,8 +4,10 @@ package joambuswebapp;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -47,7 +49,16 @@ public class TimetableServlet extends HttpServlet {
         int MM = cal.get(Calendar.MINUTE);
         String time = HH+""+((MM<10)?"0"+MM:MM);
 		
-		ArrayList<String> timeItemList= StaticValue.getTimeList(routeId, Integer.parseInt(tableNo), request);
+		ArrayList<String> timeItemList=null;
+		try {
+			timeItemList = new DBManager("JOAMBUS").timeTableList(new Integer(routeId), new Integer(tableNo));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} //StaticValue.getTimeList(routeId, Integer.parseInt(tableNo), request);
 		int index = StaticValue.findTimeIndex(timeItemList, time);
 		PrintWriter out = response.getWriter();
 		out.print("<!DOCTYPE html>" + 

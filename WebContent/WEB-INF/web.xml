@@ -16,6 +16,7 @@
     <servlet-name>main</servlet-name>
     <url-pattern>/main</url-pattern>
   </servlet-mapping> -->
+  <!-- 
   <servlet>
     <servlet-name>routeinfo</servlet-name>
     <servlet-class>joambuswebapp.BusRouteInfoServlet</servlet-class>
@@ -32,6 +33,18 @@
     <servlet-name>routeinfo2</servlet-name>
     <url-pattern>/routeinfo2</url-pattern>
   </servlet-mapping> 
+   -->
+  <servlet>
+    <servlet-name>routeinfo</servlet-name>
+    <jsp-file>/routeinfo.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>routeinfo</servlet-name>
+    <url-pattern>/routeinfo</url-pattern>
+  </servlet-mapping> 
+  
+  
+  
   <servlet>
     <servlet-name>timeinfo</servlet-name>
     <servlet-class>joambuswebapp.TimetableServlet</servlet-class>

@@ -213,7 +213,22 @@ public class DBManager {
 		
 		return answer;
 	}
-	
+	public ArrayList<String> timeTableList(int id, int type)
+			throws SQLException, UnsupportedEncodingException {
+		ArrayList<String> answer = new ArrayList<>();
+		char up='Y', weekend='N';
+		if(type%2==0) up='N';
+		if(type>2) weekend='Y';
+		String sql = "SELECT TIME FROM JOAMBUS.TIME_TABLE\r\n" + 
+				"where ROUTE_ID='"+id+"'\r\n" + 
+				"and IS_UP='"+up+"'\r\n" + 
+				"and IS_WEEKEND='"+weekend+"';";
+		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
+		while (rs.next()) {
+			answer.add(rs.getString(1).replace(":", "").substring(0, 4));
+    	}
+		return answer;
+	}
 }
 
 

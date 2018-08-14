@@ -226,7 +226,7 @@ public class StaticValue {
 		routeList.add("241483010");
 		return routeList;
 	}
-	static ArrayList<RouteInfoItem> getRouteInfoItem(ArrayList<String> routeIdList, HttpServletRequest request) throws Exception{
+	public static ArrayList<RouteInfoItem> getRouteInfoItem(ArrayList<String> routeIdList, HttpServletRequest request) throws Exception{
 		ArrayList<RouteInfoItem> result = new ArrayList<RouteInfoItem>();
 		for(String ri:routeIdList) {
 			String u = URL + URL_GET_BUS_ROUTE_INFO_ITEM + SERVICE_KEY + "&routeId=" + ri;
@@ -414,5 +414,83 @@ public class StaticValue {
 		
 	}
 		
+	//========================================
+	
+	public static ArrayList<String[]> getRouteStationList(int routeId) throws Exception {
+		ArrayList<String[]> result = new ArrayList<>();
 
+		String u = StaticValue.URL + StaticValue.URL_GET_BUS_ROUTE_STATION_LIST + StaticValue.SERVICE_KEY + "&routeId="
+				+ routeId;
+		URL url = new URL(u);
+		URLConnection connection = url.openConnection();
+		Document doc = StaticValue.parseXML(connection.getInputStream());
+		NodeList descNodes = doc.getElementsByTagName("busRouteStationList");
+		for (int i = 0; i < descNodes.getLength(); i++) {
+			String mobileNo = null;
+			String stationId= null;
+			String stationName= null;
+			String turnYn= null;
+
+			for (Node node = descNodes.item(i).getFirstChild(); node != null; node = node.getNextSibling()) { // 첫번째 자식을
+				switch (node.getNodeName()) {
+
+				case "mobileNo":
+					mobileNo = node.getTextContent();
+					break;
+				case "stationId":
+					stationId = node.getTextContent();
+					break;
+				case "stationName":
+					stationName = node.getTextContent();
+					break;
+				case "turnYn":
+					turnYn = node.getTextContent();
+					break;
+
+				}
+
+			}
+			result.add(new String[]{stationId, turnYn, stationName, mobileNo});
+		}
+
+		return result;
+	}
+	//stationSeq, endBus, lowPlate, plateNo, plateType, remainSeatCnt, routeId+"", stationId
+	public static ArrayList<String[]> getBusLocationList(int routeId) throws Exception {
+		ArrayList<String[]> result = new ArrayList<>();
+
+		String u = StaticValue.URL + StaticValue.URL_GET_BUS_LOCATION_LIST + StaticValue.SERVICE_KEY + "&routeId="
+				+ routeId;
+		URL url = new URL(u);
+		URLConnection connection = url.openConnection();
+		Document doc = StaticValue.parseXML(connection.getInputStream());
+		NodeList descNodes = doc.getElementsByTagName("busLocationList");
+		for (int i = 0; i < descNodes.getLength(); i++) {
+			String endBus = null;
+			String lowPlate = null;
+			String plateNo = null;
+			String plateType = null;
+			String remainSeatCnt = null;
+			String stationId = null;
+			String stationSeq = null;
+
+			for (Node node = descNodes.item(i).getFirstChild(); node != null; node = node.getNextSibling()) { // 첫번째 자식을
+				switch (node.getNodeName()) {
+				
+				case "endBus" :  endBus = node.getTextContent(); break;
+				case "lowPlate" : lowPlate  = node.getTextContent(); break;
+				case "plateNo" : plateNo  = node.getTextContent(); break;
+				case "plateType" : plateType  = node.getTextContent(); break;
+				case "remainSeatCnt" : remainSeatCnt  = node.getTextContent(); break;
+				case "stationId" :  stationId = node.getTextContent(); break;
+				case "stationSeq" :  stationSeq = node.getTextContent(); break;
+				
+				}
+
+			}
+			result.add(new String[] {stationSeq, endBus, lowPlate, plateNo, plateType, remainSeatCnt, routeId+"", stationId});
+		}
+		Collections.sort(result, (x, y) -> new Integer(x[0]).compareTo(new Integer(y[0])));
+		return result;
+	}
 }
