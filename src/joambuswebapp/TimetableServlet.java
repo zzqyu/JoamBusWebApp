@@ -39,8 +39,11 @@ public class TimetableServlet extends HttpServlet {
 		String routeId = request.getParameter("routeId");
 		String tableNo = request.getParameter("tableNo");
 		String title = request.getParameter("title");	
-		if(title != null) title = new String(title.getBytes("8859_1"), "UTF-8");
-
+		if(title != null) title = new String(title);
+		
+		if(title.contains("토요일")&&tableNo.equals("2")) tableNo="5";
+		
+		
 
 		TimeZone kst = TimeZone.getTimeZone ("JST"); 
 		// 주어진 시간대에 맞게 현재 시각으로 초기화된 GregorianCalender 객체를 반환.
@@ -95,13 +98,6 @@ public class TimetableServlet extends HttpServlet {
 				"}" + 
 				"</style>" + 
 				//css end
-				//js start
-				"<script>" + 
-				"(function () {" + 
-				"    location.href = \"#now\"; " + 
-				"})()" + 
-				"</script>" + 
-				//js end
 				"</head>" + 
 				//body start
 				"<body>" );

@@ -18,11 +18,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class StationInfoServlet extends HttpServlet {
+public class StationInfoServlet2 extends HttpServlet {
 	private HttpServletRequest request;
 
 	private DBManager dbm = new DBManager(StaticValue.JOAMBUS_DB_NAME);
-	public StationInfoServlet() {
+	public StationInfoServlet2() {
 		super();
 		// TODO Auto-generated constructor stub
 	}

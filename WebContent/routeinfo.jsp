@@ -6,6 +6,7 @@
 
 <%
 	boolean isJoamBus = true;
+	boolean isGbisError = false;
 	DBManager dbm = new DBManager("JOAMBUS");
 	response.setCharacterEncoding("utf-8");
 	int routeId = Integer.parseInt(request.getParameter("routeId"));
@@ -31,9 +32,16 @@
 	String colorName = StaticValue.RouteTypeToColorName(routeInfo[0]).toLowerCase();
 	int timeType=dbm.haveTimeType(routeId);
 	ArrayList<ArrayList<String>> timeTable = dbm.curTimeTable(routeId,timeType);
-	ArrayList<String[]> routeStation = dbm.routeStationList(routeId);
-	if(routeStation.isEmpty())routeStation = StaticValue.getRouteStationList(routeId);
-	ArrayList<String[]> locationList = StaticValue.getBusLocationList(routeId);
+	//ArrayList<String[]> routeStation = dbm.routeStationList(routeId);
+	ArrayList<String[]> routeStation = new ArrayList<String[]>();
+	ArrayList<String[]> locationList = new ArrayList<String[]>();
+	try{
+		if(routeStation.isEmpty())routeStation = StaticValue.getRouteStationList(routeId);
+		locationList = StaticValue.getBusLocationList(routeId);
+	}catch(GbisException e){
+		isGbisError = true;
+	}
+	
 	
 	//stationSeq, endBus, lowPlate, plateNo, plateType, remainSeatCnt, routeId+"", stationId
 	//정류장id, 반환점, 정류장이름, 정류장모바일번호
@@ -42,19 +50,20 @@
 	timetable -> 테이블종류, 당일 시간표
 	*/
 	
-	String[] tts = timeOptionNames(timeType);
+	String[] tts = timeOptionNames(timeType, routeInfo);
 %>
 <%!
-public String[] timeOptionNames(int timeType) {
+public String[] timeOptionNames(int timeType, String[] routeInfo) {
 	final String WEEKDAY_STR = "평일&ensp;";
-	final String WEEKEND_STR = "주말&ensp;";
-	final String UP_STR = "기점출발&ensp;";
-	final String DOWN_STR = "종점출발&ensp;";
+	final String WEEKEND_STR = "주말/공휴일&ensp;";
+	final String WEEKSAT_STR = "토요일&ensp;";
+	final String UP_STR = routeInfo[2]+"&ensp;";
+	final String DOWN_STR = routeInfo[3]+"&ensp;";
 	final String TIMETABLE_STR = "시간표";
 	String[] result = null;
 	if (timeType == 1) {
 		result = new String[1];
-		result[0] = TIMETABLE_STR;
+		result[0] = UP_STR+TIMETABLE_STR;
 	}
     else if (timeType == 2)
     {
@@ -76,6 +85,23 @@ public String[] timeOptionNames(int timeType) {
     	result[2] = WEEKEND_STR+UP_STR + TIMETABLE_STR;
     	result[3] = WEEKEND_STR+DOWN_STR + TIMETABLE_STR;
     }
+    else if (timeType == 5)
+    {
+    	result = new String[3];
+    	result[0] = WEEKDAY_STR+UP_STR + TIMETABLE_STR;
+    	result[1] = WEEKSAT_STR+UP_STR + TIMETABLE_STR;
+    	result[2] = WEEKEND_STR+UP_STR + TIMETABLE_STR;
+    }
+    else if (timeType == 6)
+    {
+    	result = new String[6];
+    	result[0] = WEEKDAY_STR+UP_STR + TIMETABLE_STR;
+    	result[1] = WEEKSAT_STR+UP_STR + TIMETABLE_STR;
+    	result[2] = WEEKEND_STR+UP_STR + TIMETABLE_STR;
+    	result[3] = WEEKDAY_STR+DOWN_STR + TIMETABLE_STR;
+    	result[4] = WEEKSAT_STR+DOWN_STR + TIMETABLE_STR;
+    	result[5] = WEEKEND_STR+DOWN_STR + TIMETABLE_STR;
+    }
 	return result;
 }
 
@@ -88,18 +114,42 @@ public String[] timeOptionNames(int timeType) {
 <meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width">
 <title>조암버스:<%=routeInfo[1]%>번 노선정보</title>
+<!-- Bootstrap core CSS -->
+<link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Custom styles for this template -->
+<link href="css/scrolling-nav.css" rel="stylesheet">
+<!-- Font Awesome CSS -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+
 <link rel="shortcut icon" href="/drawable/favicon.ico">
 <link href="css/routeinfo.css" rel="stylesheet">
 </style>
 </head>
 <script>
 	<%
-	String[] temp = new String[4];
-	temp[0] = tts[0].replace("기점", routeInfo[2]);
-	if(tts.length == 2) temp[1] = tts[1].replace("종점", routeInfo[3]);
+	String[] temp = new String[6];
+	temp[0] = tts[0].replace("&ensp;", " ");
+	if(tts.length == 2) temp[1] = tts[1].replace("&ensp;", " ");
 	else if(tts.length==4) {
-		temp[2] = tts[2].replace("기점", routeInfo[2]);
-		temp[3] = tts[3].replace("종점", routeInfo[3]);
+		temp[2] = tts[2].replace("&ensp;", " ");
+		temp[3] = tts[3].replace("&ensp;", " ");
+	}
+	else if(tts.length==3) {
+		temp[1] = tts[1].replace("&ensp;", " ");
+		temp[2] = tts[2].replace("&ensp;", " ");
+	}
+	else if(tts.length==6) {
+		temp[1] = tts[1].replace("&ensp;", " ");
+		temp[2] = tts[2].replace("&ensp;", " ");
+		temp[3] = tts[3].replace("&ensp;", " ");
+		temp[4] = tts[4].replace("&ensp;", " ");
+		temp[5] = tts[5].replace("&ensp;", " ");
+	}
+	if(isGbisError){
+	%>
+		alert("경기버스정보시스템 오류입니다. \n시간표 기능만 이용가능합니다. ");
+	<%
 	}
 	%>
 	function timepage(s) {
@@ -107,29 +157,32 @@ public String[] timeOptionNames(int timeType) {
 		if (s == 1 || s == "시간표") {
 			window
 					.open(
-							url+"1&title=<%=temp[0]%>",
+							url+"1&title=<%=temp[0]%>#now",
 							"_self", "");
 		} else if (s == 2) {
 			window
 					.open(
-							url+"2&title=<%=temp[1]%>",
+							url+"2&title=<%=temp[1]%>#now",
 							"_self", "");
 		} else if (s == 3) {
 			window
 					.open(
-							url+"3&title=<%=temp[2]%>",
+							url+"3&title=<%=temp[2]%>#now",
 							"_self", "");
 		} else if (s == 4) {
 			window
 					.open(
-							url+"4&title=<%=temp[3]%>",
+							url+"4&title=<%=temp[3]%>#now",
 							"_self", "");
-		} else {
+		} 
+		
+		
+		else {
 		}
 	}
 </script>
 <body>
-	<div
+	<!-- <div
 		style="position: fixed; z-index: 3; top: 0px; left: 0px; background-color: <%=routeColor%>; width: 100%; height: 55px;">
 		<p
 			style="display: inline; display: block; text-align: center; color: white; font-size: 130%;"><%=routeInfo[1]%>번</p>
@@ -137,8 +190,19 @@ public String[] timeOptionNames(int timeType) {
 		<a href="index.html"
 			style="position: absolute; top: 20px; right: 10px;"><img
 			src="/drawable/home.png" /></a>
-	</div>
-	<div id="info_and_time" style="background-color: <%=routeColor%>;">
+	</div>-->
+	<!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: <%=routeColor%>;" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="/">조암버스</a>
+        <p style="text-align:center; color:white; font-size:121%;margin-bottom:0;margin-right:75px;"\><%=routeInfo[1]%>번</p>
+        <!-- Collapsible content -->
+	    <div class="" id="navbarSupportedContent">
+	        
+		</div>
+      </div>
+    </nav>
+	<div id="info_and_time" style="background-color: <%=routeColor%>;padding-top:80px;padding-bottom:30px;padding-right:10px;">
 		<p id="subtitle"><%=routeInfo[2]%>-<%=routeInfo[3]%></p>
 		<p id="info_fl_time">첫차:<%=routeInfo[4].substring(0, 5)%> | <%=routeInfo[5].substring(0, 5)%> 막차:<%=routeInfo[6].substring(0, 5)%> | <%=routeInfo[7].substring(0, 5)%></p>
 		<%
@@ -161,13 +225,13 @@ public String[] timeOptionNames(int timeType) {
 			}
 		}
 		if(colorName.equals("yellow")){
-			out.print("실시간 위치 미지원<br><br><button onclick='location.href=\"http://m.gbis.go.kr/search/getBusRouteDetail.do?routeId="+routeId+"&osInfoType=M\"')>실시간 위치 보기</button>");		
+			out.print("<button onclick='location.href=\"http://m.gbis.go.kr/search/getBusRouteDetail.do?routeId="+routeId+"&osInfoType=M\"')>실시간 위치 보기</button>");		
 		}
 		else out.print("운행중인 버스: "+locationList.size()+"대");		
 		
 		if(isJoamBus){
 			if(tts.length == 1) {
-				out.print("<input type=\"button\" style=\"color:white;float:right;padding-right:5px;background-color:"+routeColor+";border:1px;\" value=\"시간표\" onclick=\"timepage(this.value)\" />");
+				out.print("<input type=\"button\" class=\"btn btn-outline-primary\" style=\"color:white;float:right;padding-right:5px;background-color:"+routeColor+";border:1px;\" value=\"시간표\" onclick=\"timepage(this.value)\" />");
 			}
 			else {
 				out.print("<select style=\"color:white;float:right;padding-right:5px;background-color:"+routeColor+";\" onchange=\"timepage(this.value)\">"+ 
@@ -180,7 +244,7 @@ public String[] timeOptionNames(int timeType) {
 		%>
 	</div>
 	<br>
-	<div style="position: relative; z-index: 1;">
+	<div class="container" style="position: relative; z-index: 1;">
 		<ul>
 			<%
 			//id , 턴, 이름, 모바일번호

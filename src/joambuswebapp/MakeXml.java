@@ -20,6 +20,7 @@ public class MakeXml {
 	public MakeXml() throws Exception {
 		init();
 	}
+	
 	public void init() throws Exception {
 		routeList = StaticValue.routeLocalization();
 		saveFileInServerRouteId("appfile/", "routeList", routeList);

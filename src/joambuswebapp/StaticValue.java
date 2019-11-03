@@ -1,21 +1,23 @@
 package joambuswebapp;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +28,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+
+
+
 public class StaticValue {
+	//busstationservice
+	
 	public final static String DAY_URL="http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?serviceKey=zRuxSFejoJKPbOZdUuxyIUWJF7R56lxvA5LbRwxQWj8IVxCG2F6aYImQvUJIdzvjM3EDvvYQfrQyIirNaYWkqA%3D%3D&";
 	public final static String URL = "http://openapi.gbis.go.kr/ws/rest";
 	public final static String URL_GET_STATION_ROUTE_LIST = "/busstationservice/route";
@@ -34,13 +41,14 @@ public class StaticValue {
 	public final static String URL_GET_BUS_ROUTE_STATION_LIST = "/busrouteservice/station";
 	public final static String URL_GET_BUS_LOCATION_LIST = "/buslocationservice";
 	public final static String URL_GET_BUS_STATION_ARRIVE_LIST = "/busarrivalservice/station";
+	public final static String URL_GET_STATION_LIST = "/busstationservice";
 	public final static String PUBLIC_SERVICE_KEY = "?serviceKey=1234567890";
 	public final static String PRIVATE_SERVICE_KEY = "?serviceKey=zRuxSFejoJKPbOZdUuxyIUWJF7R56lxvA5LbRwxQWj8IVxCG2F6aYImQvUJIdzvjM3EDvvYQfrQyIirNaYWkqA%3D%3D";
 	public final static String SERVICE_KEY = PRIVATE_SERVICE_KEY;
 	public final static String SERVER_URL = "https://joambusapp.azurewebsites.net";
     public final static String SERVER_URL_TIME = "/routetime";
     public final static String SERVER_URL_APP = "/appfile";
-    public final static String AD = "<div style=\"position:fixed;z-index: 3; background:#192231; padding-top:12px; bottom:0px;left:0px;width:100%;\">\r\n" + 
+    public final static String AD = "<div style=\"position:fixed;z-index: 3; background:#192231; padding-top:0px; bottom:0px;left:0px;width:100%;\">\r\n" + 
     		"	<ins id=\"name\" class=\"daum_ddn_area\" data-ad-unit=\"DAN-tol7l6smt92u\" data-ad-media=\"5l5\" data-ad-pubuser=\"l7\" data-ad-type=\"A\" data-ad-width=\"320\" data-ad-height=\"50\" data-ad-onfail=\"callBackFunc\" data-ad-init=\"done\" data-ad-status=\"done\" data-viewable-checker-id=\"I6C5Si\">\r\n" + 
     		"		 <iframe name=\"easyXDM_default7856_provider\" id=\"name_ifrm\" marginwidth=\"0\" marginheight=\"0\" frameborder=\"0\" width=\"100%\" height=\"50\" scrolling=\"no\" src=\"https://display.ad.daum.net/sdk/web?slotid=DAN-tol7l6smt92u&amp;amp;surl=https%3A%2F%2Fjoambusapp.azurewebsites.net%2Fmain&amp;amp;eid=name&amp;amp;containerid=name#xdm_e=https%3A%2F%2Fjoambusapp.azurewebsites.net&amp;amp;xdm_c=default7856&amp;amp;xdm_p=1\" style=\"display: block; border: 0px; margin: 0px auto; min-width: 320px; min-height: 50px;\">\r\n" + 
     		"        </iframe>\r\n" + 
@@ -226,62 +234,7 @@ public class StaticValue {
 		routeList.add("241483010");
 		return routeList;
 	}
-	public static ArrayList<RouteInfoItem> getRouteInfoItem(ArrayList<String> routeIdList, HttpServletRequest request) throws Exception{
-		ArrayList<RouteInfoItem> result = new ArrayList<RouteInfoItem>();
-		for(String ri:routeIdList) {
-			String u = URL + URL_GET_BUS_ROUTE_INFO_ITEM + SERVICE_KEY + "&routeId=" + ri;
-			if(ri.equals("241483004") || ri.equals("241483010"))
-                u = rootURL(request) + "/appfile/info_"+ ri + ".xml";
-			URL url = new URL(u);
-			URLConnection connection = url.openConnection();
-			Document doc = StaticValue.parseXML(connection.getInputStream());
-			NodeList descNodes = doc.getElementsByTagName("busRouteInfoItem");
-			for (int i = 0; i < descNodes.getLength(); i++) {
-				String companyName="";
-				String companyTel="";
-				String downFirstTime="";
-				String downLastTime="";
-				String endMobileNo="";
-				String endStationId="";
-				String endStationName="";
-				String routeId="";
-				String routeName="";
-				String routeTypeCd="";
-				String startMobileNo="";
-				String startStationId="";
-				String startStationName="";
-				String upFirstTime="";
-				String upLastTime="";
-			
-				for (Node node = descNodes.item(i).getFirstChild(); node != null; node = node.getNextSibling()) { // 첫번째 자식을
-					switch(node.getNodeName()) {
-						case "companyName" : companyName = node.getTextContent();  break;
-						case "companyTel" :  companyTel= node.getTextContent(); break;
-						case "downFirstTime" :  downFirstTime= node.getTextContent(); break;
-						case "downLastTime" : downLastTime = node.getTextContent(); break;
-						case "endMobileNo" :  endMobileNo= node.getTextContent(); break;
-						case "endStationId" : endStationId = node.getTextContent(); break;
-						case "endStationName" :endStationName  = node.getTextContent(); break;
-						case "routeId" : routeId = node.getTextContent(); break;
-						case "routeName" : routeName = node.getTextContent(); break;
-						case "routeTypeCd" : routeTypeCd = node.getTextContent(); break;
-						case "startMobileNo" : startMobileNo = node.getTextContent(); break;
-						case "startStationId" : startStationId = node.getTextContent(); break;
-						case "startStationName" : startStationName = node.getTextContent(); break;
-						case "upFirstTime" : upFirstTime = node.getTextContent(); break;
-						case "upLastTime" : upLastTime = node.getTextContent(); break;
-					}
 	
-				}
-				result.add(new RouteInfoItem(companyName, companyTel, downFirstTime, downLastTime, endMobileNo, endStationId, endStationName, routeId, routeName, routeTypeCd, startMobileNo, startStationId, startStationName, upFirstTime, upLastTime));
-			}
-		}
-		result.sort((x, y) -> new Float (Float.parseFloat(x.getRouteName().replace('-', '.').replaceAll("[^0-9.]", "")))
-	            .compareTo(Float.parseFloat(y.getRouteName().replace('-', '.').replaceAll("[^0-9.]", ""))));
-	            
-		return result;
-	}
-
 	public static Document parseXML(InputStream stream) throws Exception {
 
 		DocumentBuilderFactory objDocumentBuilderFactory = null;
@@ -300,6 +253,21 @@ public class StaticValue {
 
 		return doc;
 	}
+	
+	public static InputStream getXmlAtUri(String uri) throws IOException, InterruptedException {
+		System.out.println(uri);
+		HttpClient client = HttpClient.newHttpClient();
+        HttpRequest hRequest = HttpRequest.newBuilder()
+                .uri(URI.create(uri))
+                .build();
+
+        HttpResponse<InputStream>hResponse = client.send(hRequest,
+                HttpResponse.BodyHandlers.ofInputStream());
+        return hResponse.body();
+	}
+	
+	
+	
 	public static boolean isHoliday() throws Exception {
 		TimeZone kst = TimeZone.getTimeZone ("JST"); 
 		Calendar cal = Calendar.getInstance ( kst ); 
@@ -413,17 +381,171 @@ public class StaticValue {
 		}
 		
 	}
+	/**
+	 * @param stationId 정류장 id
+	 * @return 해당 정류장을 경유하는 노선들의 id 리스트
+	 */
+	public static ArrayList<String> stopByRouteList(String stationId) {
+		ArrayList<String> routeList = null;
+		String u = StaticValue.URL + StaticValue.URL_GET_STATION_ROUTE_LIST + StaticValue.SERVICE_KEY + "&stationId="+stationId;
+		try {
+			routeList = new ArrayList<String>();
 		
-	//========================================
+			Document doc = StaticValue.parseXML(getXmlAtUri(u));
+			NodeList descNodes = doc.getElementsByTagName("busRouteList");
+			for (int i = 0; i < descNodes.getLength(); i++) {
+				String routeId = null;// 노선 ID
+				for (Node node = descNodes.item(i).getFirstChild(); node != null; node = node.getNextSibling()) { // 첫번째 자식을
+					if (node.getNodeName().equals("routeId")) {
+						routeId = node.getTextContent();
+						continue;
+					}
+				}
+				
+				
+				if (!routeList.contains(routeId))
+					routeList.add(routeId);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return routeList;
+	}
 	
+	
+	/**
+	 * @param stationId 정류장 id
+	 * @return 정류장에 도착 예정인 버스정보 목록
+	 * @throws Exception
+	 */
+	public static ArrayList<BusArriveStation> getBusArriveStation(String stationId) throws Exception {
+		ArrayList<BusArriveStation> result = new ArrayList<BusArriveStation>();
+
+		String u = StaticValue.URL + StaticValue.URL_GET_BUS_STATION_ARRIVE_LIST + StaticValue.SERVICE_KEY + "&stationId="
+				+ stationId;
+		
+		Document doc = StaticValue.parseXML(getXmlAtUri(u));
+		NodeList descNodes = doc.getElementsByTagName("busArrivalList");
+		System.out.println(descNodes.getLength());
+		for (int i = 0; i < descNodes.getLength(); i++) {
+			stationId = null; 
+			String routeId = null; 
+			String locationNo1 = null; 
+			String predictTime1 = null; 
+			String lowPlate1 = null; 
+			String plateNo1 = null; 
+			String remainSeatCnt1 = null; 
+			String locationNo2 = null; 
+			String predictTime2 = null; 
+			String lowPlate2 = null; 
+			String plateNo2 = null; 
+			String remainSeatCnt2 = null; 
+			String staOrder = null; 
+			String flag = null; 
+
+			for (Node node = descNodes.item(i).getFirstChild(); node != null; node = node.getNextSibling()) { // 첫번째 자식을
+				System.out.println(node.getNodeName());
+				switch (node.getNodeName()) {
+				
+				case "stationId" : stationId = node.getTextContent(); break;
+				case "routeId" : routeId = node.getTextContent(); break;
+				case "locationNo1" : locationNo1 = node.getTextContent(); break;
+				case "predictTime1" : predictTime1 = node.getTextContent(); break;
+				case "lowPlate1" : lowPlate1 = node.getTextContent(); break;
+				case "plateNo1" : plateNo1 = node.getTextContent(); break;
+				case "remainSeatCnt1" : remainSeatCnt1 = node.getTextContent(); break;
+				case "locationNo2" : locationNo2 = node.getTextContent(); break;
+				case "predictTime2" : predictTime2 = node.getTextContent(); break;
+				case "lowPlate2" : lowPlate2 = node.getTextContent(); break;
+				case "plateNo2" : plateNo2 = node.getTextContent(); break;
+				case "remainSeatCnt2" : remainSeatCnt2 = node.getTextContent(); break;
+				case "staOrder" : staOrder = node.getTextContent(); break;
+				case "flag" : flag = node.getTextContent(); break;
+				
+				}
+				System.out.println(node.getTextContent());
+
+			}
+			result.add(new BusArriveStation(stationId,  routeId,  locationNo1, predictTime1,  lowPlate1,  plateNo1,  remainSeatCnt1,   locationNo2,  predictTime2,  lowPlate2,  plateNo2,  remainSeatCnt2,  staOrder,  flag));
+		}
+
+		return result;
+	}
+	
+	/**
+	 * @param routeIdList 노선의 ID 리스트
+	 * @param request
+	 * @return 노선들의 정보를 담은 리스트 리턴
+	 * @throws Exception
+	 */
+	public static ArrayList<RouteInfoItem> getRouteInfoItem(ArrayList<String> routeIdList, HttpServletRequest request) throws Exception{
+		ArrayList<RouteInfoItem> result = new ArrayList<RouteInfoItem>();
+		for(String ri:routeIdList) {
+			String u = URL + URL_GET_BUS_ROUTE_INFO_ITEM + SERVICE_KEY + "&routeId=" + ri;
+		
+			Document doc = StaticValue.parseXML(getXmlAtUri(u));
+			NodeList descNodes = doc.getElementsByTagName("busRouteInfoItem");
+			for (int i = 0; i < descNodes.getLength(); i++) {
+				String companyName="";
+				String companyTel="";
+				String downFirstTime="";
+				String downLastTime="";
+				String endMobileNo="";
+				String endStationId="";
+				String endStationName="";
+				String routeId="";
+				String routeName="";
+				String routeTypeCd="";
+				String startMobileNo="";
+				String startStationId="";
+				String startStationName="";
+				String upFirstTime="";
+				String upLastTime="";
+			
+				for (Node node = descNodes.item(i).getFirstChild(); node != null; node = node.getNextSibling()) { // 첫번째 자식을
+					switch(node.getNodeName()) {
+						case "companyName" : companyName = node.getTextContent();  break;
+						case "companyTel" :  companyTel= node.getTextContent(); break;
+						case "downFirstTime" :  downFirstTime= node.getTextContent(); break;
+						case "downLastTime" : downLastTime = node.getTextContent(); break;
+						case "endMobileNo" :  endMobileNo= node.getTextContent(); break;
+						case "endStationId" : endStationId = node.getTextContent(); break;
+						case "endStationName" :endStationName  = node.getTextContent(); break;
+						case "routeId" : routeId = node.getTextContent(); break;
+						case "routeName" : routeName = node.getTextContent(); break;
+						case "routeTypeCd" : routeTypeCd = node.getTextContent(); break;
+						case "startMobileNo" : startMobileNo = node.getTextContent(); break;
+						case "startStationId" : startStationId = node.getTextContent(); break;
+						case "startStationName" : startStationName = node.getTextContent(); break;
+						case "upFirstTime" : upFirstTime = node.getTextContent(); break;
+						case "upLastTime" : upLastTime = node.getTextContent(); break;
+					}
+	
+				}
+				result.add(new RouteInfoItem(companyName, companyTel, downFirstTime, downLastTime, endMobileNo, endStationId, endStationName, routeId, routeName, routeTypeCd, startMobileNo, startStationId, startStationName, upFirstTime, upLastTime));
+			}
+		}
+		result.sort((x, y) -> new Float (Float.parseFloat(x.getRouteName().replace('-', '.').replaceAll("[^0-9.]", "")))
+	            .compareTo(Float.parseFloat(y.getRouteName().replace('-', '.').replaceAll("[^0-9.]", ""))));
+	            
+		return result;
+	}
+
+	
+	
+	/**
+	 * @param routeId 노선의 id
+	 * @return 노선의 정류장 리스트 
+	 * @throws Exception
+	 */
 	public static ArrayList<String[]> getRouteStationList(int routeId) throws Exception {
 		ArrayList<String[]> result = new ArrayList<>();
 
 		String u = StaticValue.URL + StaticValue.URL_GET_BUS_ROUTE_STATION_LIST + StaticValue.SERVICE_KEY + "&routeId="
 				+ routeId;
-		URL url = new URL(u);
-		URLConnection connection = url.openConnection();
-		Document doc = StaticValue.parseXML(connection.getInputStream());
+		
+		Document doc = StaticValue.parseXML(getXmlAtUri(u));
 		NodeList descNodes = doc.getElementsByTagName("busRouteStationList");
 		for (int i = 0; i < descNodes.getLength(); i++) {
 			String mobileNo = null;
@@ -455,15 +577,19 @@ public class StaticValue {
 
 		return result;
 	}
+	/**
+	 * @param routeId 노선의 id
+	 * @return 노선의 실시간 버스 위치 정보 리스트
+	 * @throws Exception
+	 */
 	//stationSeq, endBus, lowPlate, plateNo, plateType, remainSeatCnt, routeId+"", stationId
 	public static ArrayList<String[]> getBusLocationList(int routeId) throws Exception {
 		ArrayList<String[]> result = new ArrayList<>();
 
 		String u = StaticValue.URL + StaticValue.URL_GET_BUS_LOCATION_LIST + StaticValue.SERVICE_KEY + "&routeId="
 				+ routeId;
-		URL url = new URL(u);
-		URLConnection connection = url.openConnection();
-		Document doc = StaticValue.parseXML(connection.getInputStream());
+		
+		Document doc = StaticValue.parseXML(getXmlAtUri(u));
 		NodeList descNodes = doc.getElementsByTagName("busLocationList");
 		for (int i = 0; i < descNodes.getLength(); i++) {
 			String endBus = null;
@@ -491,6 +617,45 @@ public class StaticValue {
 			result.add(new String[] {stationSeq, endBus, lowPlate, plateNo, plateType, remainSeatCnt, routeId+"", stationId});
 		}
 		Collections.sort(result, (x, y) -> new Integer(x[0]).compareTo(new Integer(y[0])));
+		return result;
+	}
+	/**
+	 * @param keyword 정류장 검색 키워드
+	 * @return 정류장 검색 결과 리스트
+	 * @throws Exception
+	 */
+	public static ArrayList<String[]> getStationSearchResult(String keyword) throws Exception {
+		ArrayList<String[]> result = new ArrayList<>();
+
+		String u = URL + URL_GET_STATION_LIST + SERVICE_KEY + "&keyword="+URLEncoder.encode(keyword, "UTF-8");
+		
+		Document doc = StaticValue.parseXML(getXmlAtUri(u));
+		NodeList descNodes = doc.getElementsByTagName("busStationList");
+		for (int i = 0; i < descNodes.getLength(); i++) {
+			String stationId = null; //정류소목록
+			String stationName = null; //정류소아이디
+			String mobileNo = null; //정류소 번호 (고유 5자리 모바일 번호)
+			String regionName = null; //지역명 (정류소가 위치하는 지역의 명칭)
+			String districtCd = null; //관할지역 (1:서울, 2:경기, 3:인천)
+			String centerYN = null; //중앙차로여부 (N : 일반, Y : 중앙차로)
+			String gpsX = null; // 정류소 X좌표
+			String gpsY = null; // 정류소 Y좌표
+
+			for (Node node = descNodes.item(i).getFirstChild(); node != null; node = node.getNextSibling()) { // 첫번째 자식을
+				switch (node.getNodeName()) {
+				case "stationId" :  stationId = node.getTextContent(); break;
+				case "stationName" :  stationName = node.getTextContent(); break;
+				case "mobileNo" :  mobileNo = node.getTextContent(); break;
+				case "regionName" :  regionName = node.getTextContent(); break;
+				case "districtCd" :  districtCd = node.getTextContent(); break;
+				case "centerYN" :  centerYN = node.getTextContent(); break;
+				case "X" :  gpsX = node.getTextContent(); break;
+				case "Y" :  gpsY = node.getTextContent(); break;
+				}
+			}
+			result.add(new String[] {stationId, stationName, mobileNo, regionName, districtCd, centerYN, gpsX, gpsY});
+		}
+		System.out.println(result.size()+"사이즈");
 		return result;
 	}
 }

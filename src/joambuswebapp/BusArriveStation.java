@@ -13,6 +13,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class BusArriveStation {
+	
 	//private String BusArrivalList; //버스도착정보목록
 	private String stationId; //정류소 아이디
 	private String routeId; //노선 아이디

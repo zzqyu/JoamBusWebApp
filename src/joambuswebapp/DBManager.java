@@ -60,7 +60,7 @@ public class DBManager {
 		String sql = "SELECT R.ID ,R.NAME, S.NAME, R.mid_station_name, (SELECT NAME FROM STATION WHERE ID=R.END_STATION), R.IS_ONEWAY \r\n" + 
 				"FROM ROUTE AS R, STATION AS S  \r\n" + 
 				"WHERE R.TYPE = " + type + " AND R.START_STATION=S.ID "+
-				"order by CAST(R.NAME AS unsigned);";
+				"order by CAST(REPLACE(REPLACE(R.NAME, '[^0-9|-]', ''), '-', '.') AS DECIMAL(10,6));";
 		System.out.println(sql.toUpperCase());
 		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
 		while (rs.next()) {
@@ -92,14 +92,18 @@ public class DBManager {
 		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
 		int weekday=1, up=1;
 		char wKeyWord='N', uKeyWord='Y';
+		boolean isSat = false;
 		while (rs.next()) {
 			if(weekday==1 && rs.getString(1).charAt(0)=='Y') weekday++;
 			if(up==1 && rs.getString(2).charAt(0)=='N') up++;
+			if(rs.getString(1).charAt(0)=='S') isSat =true;
     	}
 		int answer=1;
 		if(weekday==2 && up==1)answer+=1;
 		else if(weekday==1 && up==2)answer+=2;
 		else if(weekday==2 && up==2)answer+=3;
+		if(isSat) answer=5;
+		if(answer==5 && up==2) answer++;
 		return answer;
 	}
 	public ArrayList<ArrayList<String>> curTimeTable(int id, int timeType) throws Exception {
@@ -118,10 +122,15 @@ public class DBManager {
         String time = HH+":"+((MM<10)?"0"+MM:MM);
         System.out.println("dayOfWeek="+DayOfWeek.of(dayOfWeek)+" timeType = "+timeType);
         if (timeType >= 3) isUpDown = true;
+        if (timeType == 5) isUpDown = false;
         if (timeType%2==0 && 
         		(DayOfWeek.of(dayOfWeek) == DayOfWeek.SATURDAY 
         		|| DayOfWeek.of(dayOfWeek) == DayOfWeek.SUNDAY
         		|| StaticValue.isHoliday())) isWeekend = 'Y';
+        if(timeType >= 5) {
+        	if(DayOfWeek.of(dayOfWeek) == DayOfWeek.SATURDAY )isWeekend = 'S';
+        	if(DayOfWeek.of(dayOfWeek) == DayOfWeek.SUNDAY )isWeekend = 'Y';
+        }
         
         
 		String sql = "SELECT TIME \r\n" + 
@@ -219,6 +228,7 @@ public class DBManager {
 		char up='Y', weekend='N';
 		if(type%2==0) up='N';
 		if(type>2) weekend='Y';
+		if(type>=5) weekend='S';
 		String sql = "SELECT TIME FROM JOAMBUS.TIME_TABLE\r\n" + 
 				"where ROUTE_ID='"+id+"'\r\n" + 
 				"and IS_UP='"+up+"'\r\n" + 
