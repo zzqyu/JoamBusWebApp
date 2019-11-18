@@ -11,7 +11,11 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Time;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -48,7 +52,7 @@ public class StaticValue {
 	public final static String SERVER_URL = "https://joambusapp.azurewebsites.net";
     public final static String SERVER_URL_TIME = "/routetime";
     public final static String SERVER_URL_APP = "/appfile";
-    public final static String AD = "<div style=\"position:fixed;z-index: 3; background:#192231; padding-top:0px; bottom:0px;left:0px;width:100%;\">\r\n" + 
+    public final static String AD = "<div style=\"position:fixed;z-index: 3; background:#192231; padding-top:0px; bottom:-8px;left:0px;width:100%;\">\r\n" + 
     		"	<ins id=\"name\" class=\"daum_ddn_area\" data-ad-unit=\"DAN-tol7l6smt92u\" data-ad-media=\"5l5\" data-ad-pubuser=\"l7\" data-ad-type=\"A\" data-ad-width=\"320\" data-ad-height=\"50\" data-ad-onfail=\"callBackFunc\" data-ad-init=\"done\" data-ad-status=\"done\" data-viewable-checker-id=\"I6C5Si\">\r\n" + 
     		"		 <iframe name=\"easyXDM_default7856_provider\" id=\"name_ifrm\" marginwidth=\"0\" marginheight=\"0\" frameborder=\"0\" width=\"100%\" height=\"50\" scrolling=\"no\" src=\"https://display.ad.daum.net/sdk/web?slotid=DAN-tol7l6smt92u&amp;amp;surl=https%3A%2F%2Fjoambusapp.azurewebsites.net%2Fmain&amp;amp;eid=name&amp;amp;containerid=name#xdm_e=https%3A%2F%2Fjoambusapp.azurewebsites.net&amp;amp;xdm_c=default7856&amp;amp;xdm_p=1\" style=\"display: block; border: 0px; margin: 0px auto; min-width: 320px; min-height: 50px;\">\r\n" + 
     		"        </iframe>\r\n" + 
@@ -658,4 +662,5 @@ public class StaticValue {
 		System.out.println(result.size()+"사이즈");
 		return result;
 	}
+	
 }

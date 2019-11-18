@@ -15,17 +15,20 @@
 	if(routeInfo==null) { 
 		isJoamBus = false;
 		System.out.println("없는 노선");
-		RouteInfoItem routeItem = null;
-		try {
-			ArrayList<String> ri = new ArrayList<String>();
-			ri.add(routeId+"");
-			routeItem = StaticValue.getRouteInfoItem(ri, request).get(0);
-			routeInfo = new String[]{routeItem.getRouteTypeCd(), routeItem.getRouteName(), 
-					routeItem.getStartStationName(), routeItem.getEndStationName(), 
-					routeItem.getUpFirstTime(), routeItem.getDownFirstTime(),
-					routeItem.getUpLastTime(), routeItem.getDownLastTime()};
-		} catch (Exception e) {
-			e.printStackTrace();
+		routeInfo = dbm.gbisRouteInfo(routeId);
+			if(routeInfo==null){
+			RouteInfoItem routeItem = null;
+			try {
+				ArrayList<String> ri = new ArrayList<String>();
+				ri.add(routeId+"");
+				routeItem = StaticValue.getRouteInfoItem(ri, request).get(0);
+				routeInfo = new String[]{routeItem.getRouteTypeCd(), routeItem.getRouteName(), 
+						routeItem.getStartStationName(), routeItem.getEndStationName(), 
+						routeItem.getUpFirstTime(), routeItem.getDownFirstTime(),
+						routeItem.getUpLastTime(), routeItem.getDownLastTime()};
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	String routeColor = StaticValue.RouteTypeToColor(routeInfo[0]);
@@ -157,22 +160,22 @@ public String[] timeOptionNames(int timeType, String[] routeInfo) {
 		if (s == 1 || s == "시간표") {
 			window
 					.open(
-							url+"1&title=<%=temp[0]%>#now",
+							url+"1&title=<%=temp[0]%>",
 							"_self", "");
 		} else if (s == 2) {
 			window
 					.open(
-							url+"2&title=<%=temp[1]%>#now",
+							url+"2&title=<%=temp[1]%>",
 							"_self", "");
 		} else if (s == 3) {
 			window
 					.open(
-							url+"3&title=<%=temp[2]%>#now",
+							url+"3&title=<%=temp[2]%>",
 							"_self", "");
 		} else if (s == 4) {
 			window
 					.open(
-							url+"4&title=<%=temp[3]%>#now",
+							url+"4&title=<%=temp[3]%>",
 							"_self", "");
 		} 
 		
@@ -182,15 +185,6 @@ public String[] timeOptionNames(int timeType, String[] routeInfo) {
 	}
 </script>
 <body>
-	<!-- <div
-		style="position: fixed; z-index: 3; top: 0px; left: 0px; background-color: <%=routeColor%>; width: 100%; height: 55px;">
-		<p
-			style="display: inline; display: block; text-align: center; color: white; font-size: 130%;"><%=routeInfo[1]%>번</p>
-
-		<a href="index.html"
-			style="position: absolute; top: 20px; right: 10px;"><img
-			src="/drawable/home.png" /></a>
-	</div>-->
 	<!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: <%=routeColor%>;" id="mainNav">
       <div class="container">
@@ -225,7 +219,7 @@ public String[] timeOptionNames(int timeType, String[] routeInfo) {
 			}
 		}
 		if(colorName.equals("yellow")){
-			out.print("<button onclick='location.href=\"http://m.gbis.go.kr/search/getBusRouteDetail.do?routeId="+routeId+"&osInfoType=M\"')>실시간 위치 보기</button>");		
+			out.print("<button class=\"btn btn-sm \" style=\"color:white;background-color:"+routeColor+";border:1px;\" onclick='location.href=\"http://m.gbis.go.kr/search/getBusRouteDetail.do?routeId="+routeId+"&osInfoType=M\"')>실시간 위치</button>");		
 		}
 		else out.print("운행중인 버스: "+locationList.size()+"대");		
 		
@@ -289,6 +283,16 @@ public String[] timeOptionNames(int timeType, String[] routeInfo) {
 		</ul>
 	</div>
 	<%=StaticValue.AD%>
+	
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom JavaScript for this theme -->
+    <script src="js/scrolling-nav.js"></script>
 </body>
 </html>
 

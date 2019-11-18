@@ -83,6 +83,23 @@ public class DBManager {
     	}
 		return answer;
 	}
+	public String[] gbisRouteInfo(int id)
+			throws SQLException, UnsupportedEncodingException {
+		String[] answer = null;
+		String sql = "SELECT ROUTE_TP, ROUTE_NM, ST_STA_NM,\r\n" + 
+				"ED_STA_NM, UP_FIRST_TIME, DOWN_FIRST_TIME, UP_LAST_TIME, DOWN_LAST_TIME \r\n" + 
+				"FROM JOAMBUS.GBIS_ROUTE\r\n" + 
+				"WHERE ROUTE_ID = "+id+";";
+		System.out.println(sql.toUpperCase());
+		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
+		while (rs.next()) {
+			answer = new String[] {rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4)
+					, rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8)};
+			break;
+    	}
+		return answer;
+	}
+	
 	public int haveTimeType(int id) throws SQLException, UnsupportedEncodingException {
 		String sql = "SELECT IS_WEEKEND , IS_UP\r\n" + 
 				"FROM JOAMBUS.TIME_TABLE \r\n" + 
@@ -165,22 +182,7 @@ public class DBManager {
 		}
 		return answer;
 	}
-	public ArrayList<String[]> routeStationList(int id)
-			throws SQLException, UnsupportedEncodingException {
-		
-		ArrayList<String[]> answer = new ArrayList<String[]>();
-		String sql="SELECT STATION_ID, IS_TURN, S.NAME, S.MOBILE_NO\r\n" + 
-				"FROM JOAMBUS.ROUTE_STATION, JOAMBUS.STATION AS S\r\n" + 
-				"WHERE ROUTE_ID='"+id+"'\r\n" + 
-				"AND STATION_ID=S.ID\r\n" + 
-				"order by SEQUENCE;";
-		System.out.println(sql.toUpperCase());
-		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
-		while (rs.next()) {
-			answer.add(new String[] {rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4)});
-    	}
-		return answer;
-	}
+	
 	public ArrayList<HashMap<String, String>> getDBDataList(String tableName, String[] tagTitles, String criteriaTag, boolean isInc, String[] conditionTags, String[] conditionValue) throws SQLException{
 		String sql = "SELECT ";
 		for (String tag: tagTitles) {
@@ -238,6 +240,45 @@ public class DBManager {
 			answer.add(rs.getString(1).replace(":", "").substring(0, 4));
     	}
 		return answer;
+	}
+	
+	public ArrayList<String[]> getBusSearchResult(String keyword)
+			throws SQLException, UnsupportedEncodingException {
+		ArrayList<String[]> answer = new ArrayList<>();
+		String sql = "select ROUTE_ID, ROUTE_NM, ST_STA_NM, ED_STA_NM, ROUTE_TP from JOAMBUS.GBIS_ROUTE where ROUTE_NM like '%"+keyword+"%' order by ROUTE_NM;";
+		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
+		while(rs.next()){
+	        String[] row = new String[] {"ROUTE_ID", "ROUTE_NM", "ST_STA_NM", "ED_STA_NM", "ROUTE_TP"};
+        	for(int i=0; i<row.length; i++)
+        		row[i]=rs.getString(row[i]);
+        	answer.add(row);
+        }
+		return answer;
+	}
+	
+	public void routeInsertAndUpdate(String values) {
+		//INSERT INTO table_name VALUES (value1, value2, value3,...)
+		String sql = "REPLACE INTO JOAMBUS.GBIS_ROUTE VALUES ";
+		sql+=values+";";
+		System.out.println(sql);
+        try {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+	}
+	public void stationInsertAndUpdate(String values) {
+		//INSERT INTO table_name VALUES (value1, value2, value3,...)
+		String sql = "REPLACE INTO JOAMBUS.STATION VALUES ";
+		sql+=values+";";
+		System.out.println(sql);
+        try {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 	}
 }
 

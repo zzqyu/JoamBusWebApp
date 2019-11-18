@@ -34,39 +34,9 @@
     <servlet-name>stationinfo</servlet-name>
     <url-pattern>/stationinfo</url-pattern>
   </servlet-mapping> 
-  <!-- <servlet>
-    <servlet-name>main</servlet-name>
-    <servlet-class>joambuswebapp.MainServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>main</servlet-name>
-    <url-pattern>/main</url-pattern>
-  </servlet-mapping> -->
-  <!-- 
-  <servlet>
-    <servlet-name>routeinfo</servlet-name>
-    <servlet-class>joambuswebapp.BusRouteInfoServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>routeinfo</servlet-name>
-    <url-pattern>/routeinfo</url-pattern>
-  </servlet-mapping> 
-  <servlet>
-    <servlet-name>routeinfo2</servlet-name>
-    <servlet-class>joambuswebapp.BusRouteInfoServlet2</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>routeinfo2</servlet-name>
-    <url-pattern>/routeinfo2</url-pattern>
-  </servlet-mapping> 
-   -->
-  
-  
-  
-  
   <servlet>
     <servlet-name>timeinfo</servlet-name>
-    <servlet-class>joambuswebapp.TimetableServlet</servlet-class>
+    <jsp-file>/timeinfo.jsp</jsp-file>
   </servlet>
   <servlet-mapping>
     <servlet-name>timeinfo</servlet-name>

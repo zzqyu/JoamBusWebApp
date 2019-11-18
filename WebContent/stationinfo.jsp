@@ -14,7 +14,8 @@
 	//String stationName = new String(request.getParameter("stationName").getBytes("8859_1"), "UTF-8"); //정류장 이름
 	String stationName = new String(request.getParameter("stationName")); //정류장 이름
 	
-	
+
+	DBManager dbm = new DBManager("JOAMBUS");
 	
 %>
 
@@ -25,6 +26,7 @@
 <meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width">
 <title>조암버스</title>
+<link rel="shortcut icon" href="/drawable/favicon.ico">
 <!-- Bootstrap core CSS -->
 <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -85,14 +87,6 @@ header {
 		</div>
       </div>
     </nav>
-	<!-- <div style="position:fixed;z-index: 3;top:0px;left:0px;background-color:#ec6778;width:100%; height:55px;"\>  
-				        <p style="display:inline; display:block;text-align:center; color:white; font-size:130%;"\><%=stationName+"("+stationMbId+")"%></p>  
-				  
-				        <a href=index.html style="position:absolute;top:20px;left:10px;"\>  
-				            <img src="/drawable/home.png" />  
-						</a>   
-				    </div>-->
-	
 	<div id="list" class="container bus_List">
 		<header id=header><p>운행중인 버스</p></header>
 		<div class="list-group">
@@ -108,12 +102,30 @@ header {
 					arriveRouteIds.add(routeItem.getRouteId());
 					String routeId, routeTypeCd, routeName, startStationName, middleStationName, endStationName, direction, isInDB="";
 					routeId = routeItem.getRouteId();
-					RouteInfoItem rii = StaticValue.getRouteInfoItem(new ArrayList<String>(Arrays.asList(new String[] {routeId})), request).get(0);
-					routeTypeCd = rii.getRouteTypeCd();
-					routeName = rii.getRouteName();
-					startStationName = rii.getStartStationName();
+					
+					String[] routeInfo = dbm.routeInfo(Integer.parseInt(routeId));
+					if(routeInfo==null) { 
+						System.out.println("없는 노선");
+						routeInfo = dbm.gbisRouteInfo(Integer.parseInt(routeId));
+						if(routeInfo==null){
+							try {
+								ArrayList<String> ri = new ArrayList<String>();
+								ri.add(routeId+"");
+								RouteInfoItem ii = StaticValue.getRouteInfoItem(ri, request).get(0);
+								routeInfo = new String[]{ii.getRouteTypeCd(), ii.getRouteName(), 
+										ii.getStartStationName(), ii.getEndStationName(), 
+										ii.getUpFirstTime(), ii.getDownFirstTime(),
+										ii.getUpLastTime(), ii.getDownLastTime()};
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}
+					routeTypeCd = routeInfo[0];
+					routeName = routeInfo[1];
+					startStationName = routeInfo[2];
 					middleStationName = "";
-					endStationName = rii.getEndStationName();
+					endStationName = routeInfo[3];
 					direction = "-";
 					
 					out.print("<a class='list-group-item list-group-item-action' "+
@@ -145,17 +157,40 @@ header {
 				for(String arriveRouteId: arriveRouteIds) {
 					gbisRouteList.remove(arriveRouteId);
 				}
+				//50-1추가
+				
 				//리스트로 표출하기
 				for(String gbisRouteId: gbisRouteList) {
-					RouteInfoItem rii = StaticValue.getRouteInfoItem(new ArrayList<String>(Arrays.asList(new String[] {gbisRouteId})), request).get(0);
-												
+					String routeId, routeTypeCd, routeName, startStationName, middleStationName, endStationName, direction;
+					String[] routeInfo = dbm.routeInfo(Integer.parseInt(gbisRouteId));
+					if(routeInfo==null) { 
+						System.out.println("없는 노선");
+						routeInfo = dbm.gbisRouteInfo(Integer.parseInt(gbisRouteId));
+						if(routeInfo==null){
+							try {
+								ArrayList<String> ri = new ArrayList<String>();
+								ri.add(gbisRouteId+"");
+								RouteInfoItem ii = StaticValue.getRouteInfoItem(ri, request).get(0);
+								routeInfo = new String[]{ii.getRouteTypeCd(), ii.getRouteName(), 
+										ii.getStartStationName(), ii.getEndStationName(), 
+										ii.getUpFirstTime(), ii.getDownFirstTime(),
+										ii.getUpLastTime(), ii.getDownLastTime()};
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}
+					routeTypeCd = routeInfo[0];
+					routeName = routeInfo[1];
+					startStationName = routeInfo[2];
+					endStationName = routeInfo[3];
 					out.print("<a class='list-group-item list-group-item-action' "+
 			    			"href='routeinfo.jsp?routeId="+gbisRouteId+"'><table>"+
 							"<tbody><tr>"+
 									"<td rowspan='3'><img width='40px'"+
-											"src='drawable/bus_"+StaticValue.RouteTypeToColorName(rii.getRouteTypeCd()).toLowerCase()+".PNG'></td>"+
-									"<td id='s_name'>"+rii.getRouteName()+"</td>"+
-								"</tr><tr><td id='s_mbno'>"+rii.getStartStationName().split("[.(]")[0]+"-"+rii.getEndStationName().split("[.(]")[0]+"</td></tr></tbody></table></a>");
+											"src='drawable/bus_"+StaticValue.RouteTypeToColorName(routeTypeCd).toLowerCase()+".PNG'></td>"+
+									"<td id='s_name'>"+routeName+"</td>"+
+								"</tr><tr><td id='s_mbno'>"+startStationName.split("[.(]")[0]+"-"+endStationName.split("[.(]")[0]+"</td></tr></tbody></table></a>");
 				}
 				
 			}catch (Exception e) {
@@ -166,6 +201,15 @@ header {
 		
 		%>
 	</div>
+	<!-- Footer -->
+    <footer class="py-5 bg-dark" >
+      <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; Joam Bus Web App 2018</p>
+        <div style="padding-bottom:50px;"></div>
+      </div>
+      <!-- /.container -->
+    </footer>
+	<%=StaticValue.AD%>
 	<!-- Bootstrap core JavaScript -->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
