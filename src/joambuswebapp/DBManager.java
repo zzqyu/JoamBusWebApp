@@ -18,7 +18,15 @@ import java.util.TimeZone;
 public class DBManager {
 	static String ENCORD = "UTF-8";
     //static String DB_NAME = "joambusdb";
-    static String SQL_URL = "jdbc:mysql://52.79.170.189:3306/";
+	//127.0.0.1:50344
+	//본 서버
+    //static String SQL_URL = "jdbc:mysql://127.0.0.1:49431/";
+
+	//예비 서버
+	//static String SQL_URL = "jdbc:mysql://127.0.0.1:55863/";
+	
+	//로컬 서버
+	static String SQL_URL = "jdbc:mysql://127.0.0.1:3306/";
     static String SQL_CLASS_NAME = "com.mysql.jdbc.Driver";
 
     private Connection conn;
@@ -29,7 +37,8 @@ public class DBManager {
         try {
             Class.forName(SQL_CLASS_NAME);
             //sql db에 연결
-            conn = DriverManager.getConnection(SQL_URL+dbName , "root", "005410");
+            //conn = DriverManager.getConnection(SQL_URL+dbName , "root", "005410");
+            conn = DriverManager.getConnection(SQL_URL+dbName , "azure", "6#vWHD_$");
             System.out.println("DB 연결 완료");
             //sql문을 쓰기 위해 객체 생성
             stmt = conn.createStatement();
@@ -57,10 +66,16 @@ public class DBManager {
 	public ArrayList<String[]> mainRouteList(int type)
 			throws SQLException, UnsupportedEncodingException {
 		ArrayList<String[]> answer = new ArrayList<String[]>();
-		String sql = "SELECT R.ID ,R.NAME, S.NAME, R.mid_station_name, (SELECT NAME FROM STATION WHERE ID=R.END_STATION), R.IS_ONEWAY \r\n" + 
+		/*String sql = "SELECT R.ID ,R.NAME, S.NAME, R.mid_station_name, (SELECT NAME FROM STATION WHERE ID=R.END_STATION), R.IS_ONEWAY \r\n" + 
 				"FROM ROUTE AS R, STATION AS S  \r\n" + 
 				"WHERE R.TYPE = " + type + " AND R.START_STATION=S.ID "+
-				"order by CAST(REPLACE(REPLACE(R.NAME, '[^0-9|-]', ''), '-', '.') AS DECIMAL(10,6));";
+				"order by CAST(REPLACE(REPLACE(R.NAME, '[^0-9|-]', ''), '-', '.') AS DECIMAL(10,6));";*/
+		String sql = "SELECT R.ROUTE_ID ,R.ROUTE_NM, S.STATION_NM, R.MID_STATION, (SELECT STATION_NM FROM JOAMBUS.STATION WHERE STATION_ID=R.ED_STA_ID), R.IS_ONEWAY\r\n" + 
+				"				FROM JOAMBUS.ROUTE AS R, JOAMBUS.STATION AS S  \r\n" + 
+				"				WHERE R.ROUTE_TP =  " + type + " \r\n" + 
+				"                AND R.ST_STA_ID=S.STATION_ID \r\n" + 
+				"                AND R.IS_ONEWAY IS NOT NULL\r\n" + 
+				"				order by CAST(REPLACE(REPLACE(R.ROUTE_NM, '[^0-9|-]', ''), '-', '.') AS DECIMAL(10,6));";
 		System.out.println(sql.toUpperCase());
 		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
 		while (rs.next()) {
@@ -69,16 +84,19 @@ public class DBManager {
 		return answer;
 	}
 	public String[] routeInfo(int id)
-			throws SQLException, UnsupportedEncodingException {
+			throws SQLException, UnsupportedEncodingException, NullPointerException {
 		String[] answer = null;
-		String sql = "SELECT R.TYPE, R.NAME, S.NAME as 'START',(SELECT NAME FROM STATION WHERE ID=R.END_STATION) AS 'END', R.START_FIRST, R.END_START, R.START_LAST, R.END_LAST \r\n" + 
+		/*String sql = "SELECT R.TYPE, R.NAME, S.NAME as 'START',(SELECT NAME FROM STATION WHERE ID=R.END_STATION) AS 'END', R.START_FIRST, R.END_START, R.START_LAST, R.END_LAST \r\n" + 
 				"FROM ROUTE AS R, JOAMBUS.STATION AS S  \r\n" + 
-				"WHERE R.ID = "+id+" AND R.START_STATION=S.ID;";
+				"WHERE R.ID = "+id+" AND R.START_STATION=S.ID;";*/
+		String sql = "SELECT R.ROUTE_TP, R.ROUTE_NM, S.STATION_NM AS 'START',(SELECT STATION_NM FROM JOAMBUS.STATION WHERE STATION_ID=R.ED_STA_ID) AS 'END', R.UP_FIRST_TIME, R.UP_LAST_TIME, R.DOWN_FIRST_TIME, R.DOWN_LAST_TIME, R.IS_ONEWAY \r\n" + 
+				"FROM JOAMBUS.ROUTE AS R, JOAMBUS.STATION AS S  \r\n" + 
+				"WHERE R.ROUTE_ID = "+id+" AND R.ST_STA_ID=S.STATION_ID;";
 		System.out.println(sql.toUpperCase());
 		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
 		while (rs.next()) {
 			answer = new String[] {rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4)
-					, rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8)};
+					, rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9)};
 			break;
     	}
 		return answer;
@@ -88,7 +106,7 @@ public class DBManager {
 		String[] answer = null;
 		String sql = "SELECT ROUTE_TP, ROUTE_NM, ST_STA_NM,\r\n" + 
 				"ED_STA_NM, UP_FIRST_TIME, DOWN_FIRST_TIME, UP_LAST_TIME, DOWN_LAST_TIME \r\n" + 
-				"FROM JOAMBUS.GBIS_ROUTE\r\n" + 
+				"FROM JOAMBUS.ROUTE\r\n" + 
 				"WHERE ROUTE_ID = "+id+";";
 		System.out.println(sql.toUpperCase());
 		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
@@ -126,6 +144,7 @@ public class DBManager {
 	public ArrayList<ArrayList<String>> curTimeTable(int id, int timeType) throws Exception {
 		ArrayList<ArrayList<String>> answer = new ArrayList<ArrayList<String>>();
 		boolean isUpDown = false;
+		boolean isHoliday = StaticValue.isHoliday(false);
         char isWeekend = 'N';
         Date now = new Date();
         
@@ -134,6 +153,7 @@ public class DBManager {
 		Calendar cal = Calendar.getInstance ( kst ); 
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)-1;
         if(dayOfWeek==0)dayOfWeek=7;
+        if(isHoliday&&dayOfWeek<=5)dayOfWeek=7;
         int HH = cal.get(Calendar.HOUR_OF_DAY);
         int MM = cal.get(Calendar.MINUTE);
         String time = HH+":"+((MM<10)?"0"+MM:MM);
@@ -142,8 +162,7 @@ public class DBManager {
         if (timeType == 5) isUpDown = false;
         if (timeType%2==0 && 
         		(DayOfWeek.of(dayOfWeek) == DayOfWeek.SATURDAY 
-        		|| DayOfWeek.of(dayOfWeek) == DayOfWeek.SUNDAY
-        		|| StaticValue.isHoliday())) isWeekend = 'Y';
+        		|| DayOfWeek.of(dayOfWeek) == DayOfWeek.SUNDAY)) isWeekend = 'Y';
         if(timeType >= 5) {
         	if(DayOfWeek.of(dayOfWeek) == DayOfWeek.SATURDAY )isWeekend = 'S';
         	if(DayOfWeek.of(dayOfWeek) == DayOfWeek.SUNDAY )isWeekend = 'Y';
@@ -245,7 +264,7 @@ public class DBManager {
 	public ArrayList<String[]> getBusSearchResult(String keyword)
 			throws SQLException, UnsupportedEncodingException {
 		ArrayList<String[]> answer = new ArrayList<>();
-		String sql = "select ROUTE_ID, ROUTE_NM, ST_STA_NM, ED_STA_NM, ROUTE_TP from JOAMBUS.GBIS_ROUTE where ROUTE_NM like '%"+keyword+"%' order by ROUTE_NM;";
+		String sql = "select ROUTE_ID, ROUTE_NM, ST_STA_NM, ED_STA_NM, ROUTE_TP from JOAMBUS.ROUTE where ROUTE_NM like '%"+keyword+"%' order by ROUTE_NM;";
 		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
 		while(rs.next()){
 	        String[] row = new String[] {"ROUTE_ID", "ROUTE_NM", "ST_STA_NM", "ED_STA_NM", "ROUTE_TP"};
@@ -279,6 +298,79 @@ public class DBManager {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+	}
+	//정류장 노선목록 마을버스 추가
+	public ArrayList<String> localRouteSelectAtStation(String stationId)throws SQLException {
+		//SELECT ROUTE_ID FROM joambus.routestation as rs where STATION_ID = 233001517 and EXISTS (SELECT ROUTE_ID FROM joambus.route as r where IS_ONEWAY IS NOT NULL and ROUTE_TP=30 and r.ROUTE_ID=rs.ROUTE_ID);
+		ArrayList<String> answer = new ArrayList<>();
+		String sql = "SELECT ROUTE_ID FROM joambus.routestation as rs where STATION_ID = "+stationId+" and EXISTS (SELECT ROUTE_ID FROM joambus.route as r where IS_ONEWAY IS NOT NULL and ROUTE_TP=30 and r.ROUTE_ID=rs.ROUTE_ID);";
+		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
+		while(rs.next()){
+	        String item = null;
+	        item = rs.getString("ROUTE_ID");
+        	answer.add(item);
+        }
+		return answer;
+	}
+	//정류장 시간표 시간순
+	public ArrayList<String[]> stationOfTimetable(String stationId, boolean isWeekend, Boolean[] refHoliVisible)throws SQLException {
+		ArrayList<String[]> answer = new ArrayList<>();
+		String where = " AND t.IS_WEEKEND=\"N\" ";
+		if(isWeekend)where = " AND (t.IS_WEEKEND=\"Y\" OR (not exists (select IS_WEEKEND from joambus.time_table where ROUTE_ID=rs.ROUTE_ID AND IS_WEEKEND=\"Y\"))) ";
+		String sql = "SELECT t.TIME, rs.ROUTE_ID, rs.ROUTE_NM, CASE WHEN is_up = 'Y' THEN r.ST_STA_NM ELSE r.ED_STA_NM END AS `출발지`,CASE WHEN rs.STA_ORDER >= (select STA_ORDER from joambus.routestation where ROUTE_ID=r.ROUTE_ID and STATION_ID=r.ED_STA_ID limit 1) THEN  r.ST_STA_NM ELSE r.ED_STA_NM END AS `도착지`" + 
+				" FROM joambus.time_table as t, joambus.routestation as rs, joambus.route as r " + 
+				" WHERE rs.STATION_ID="+stationId+
+				" AND rs.ROUTE_ID!=233000139 AND rs.ROUTE_ID!=233000271 AND rs.ROUTE_ID=t.ROUTE_ID AND r.ROUTE_ID=t.ROUTE_ID"+
+				where+
+				" AND (t.IS_UP=rs.UPDOWN OR (t.IS_UP!=rs.UPDOWN AND not exists (select IS_UP from joambus.time_table where ROUTE_ID=rs.ROUTE_ID AND IS_UP=\"N\"))) " + 
+				" ORDER BY t.TIME;";
+		System.out.println(sql);
+		String[] routeNms= {"50-1","2000"};
+		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
+		while(rs.next()){//시간, rID, 노선명, 시간표기준지, 방향
+        	answer.add(new String[] {rs.getString(1).substring(0, 5), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5)});
+        	if(refHoliVisible!=null && !refHoliVisible[0]) {
+        		for(String nm: routeNms) {
+        			if(rs.getString(3).contains(nm)) {
+        				refHoliVisible[0] = true;
+        				break;
+        			}
+        		}
+        	}
+        }
+		return answer;
+	}
+	//정류장 시간표 출발지별 시간순 + 현재시간 이후 3타임
+	public HashMap<String, ArrayList<String[]>> stationOfTimetableOrderbyStart(String stationId, boolean isWeekend, String time)throws SQLException {
+		HashMap<String, ArrayList<String[]>> answer = new HashMap<>();
+		String where = " AND t.IS_WEEKEND=\"N\"";
+		String timeSql = " AND t.TIME >= \""+time+"\"";
+		if(time==null) timeSql="";
+		if(isWeekend)where = " AND (t.IS_WEEKEND=\"Y\" OR (not exists (select IS_WEEKEND from joambus.time_table where ROUTE_ID=rs.ROUTE_ID AND IS_WEEKEND=\"Y\")))";
+		String sql = "SELECT t.TIME, rs.ROUTE_ID, rs.ROUTE_NM, CASE WHEN is_up = 'Y' THEN r.ST_STA_NM ELSE r.ED_STA_NM END AS `출발지`,CASE WHEN rs.STA_ORDER >= (select STA_ORDER from joambus.routestation where ROUTE_ID=r.ROUTE_ID and STATION_ID=r.ED_STA_ID limit 1) THEN  r.ST_STA_NM ELSE r.ED_STA_NM END AS `도착지`" + 
+				" FROM joambus.time_table as t, joambus.routestation as rs, joambus.route as r" + 
+				" WHERE rs.STATION_ID="+stationId+
+				" AND rs.ROUTE_ID!=233000139 AND rs.ROUTE_ID!=233000271 AND rs.ROUTE_ID=t.ROUTE_ID AND r.ROUTE_ID=t.ROUTE_ID"+
+				where+
+				" AND (t.IS_UP=rs.UPDOWN OR (t.IS_UP!=rs.UPDOWN AND not exists (select IS_UP from joambus.time_table where ROUTE_ID=rs.ROUTE_ID AND IS_UP=\"N\")))" + 
+				timeSql+
+				" ORDER BY `출발지`, t.TIME;";
+		System.out.println(sql);
+		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
+		while(rs.next()){
+			String key = rs.getString(4);
+			if(answer.containsKey(key)) {//키 있을때
+				if(time!=null&&answer.get(key).size()==3) continue;
+				answer.get(key).add(new String[] {rs.getString(1).substring(0, 5), rs.getString(2), rs.getString(3), rs.getString(5)});
+			}
+			else {//키 처음
+				ArrayList<String[]> item = new ArrayList<>();
+				item.add(new String[] {rs.getString(1).substring(0, 5), rs.getString(2), rs.getString(3), rs.getString(5)});
+				answer.put(key, item);
+			}
+			
+        }
+		return answer;
 	}
 }
 

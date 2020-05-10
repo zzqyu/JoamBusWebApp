@@ -12,7 +12,8 @@
 	int routeId = Integer.parseInt(request.getParameter("routeId"));
 	//유형, 이름, 기점, 종점, 기점첫차, 종점첫차, 기점막차, 종점막차
 	String[] routeInfo = dbm.routeInfo(routeId);
-	if(routeInfo==null) { 
+	isJoamBus = routeInfo[8]!=null;
+	/*if(routeInfo==null) { 
 		isJoamBus = false;
 		System.out.println("없는 노선");
 		routeInfo = dbm.gbisRouteInfo(routeId);
@@ -30,7 +31,7 @@
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 	String routeColor = StaticValue.RouteTypeToColor(routeInfo[0]);
 	String colorName = StaticValue.RouteTypeToColorName(routeInfo[0]).toLowerCase();
 	int timeType=dbm.haveTimeType(routeId);
@@ -44,7 +45,6 @@
 	}catch(GbisException e){
 		isGbisError = true;
 	}
-	
 	
 	//stationSeq, endBus, lowPlate, plateNo, plateType, remainSeatCnt, routeId+"", stationId
 	//정류장id, 반환점, 정류장이름, 정류장모바일번호
@@ -124,65 +124,21 @@ public String[] timeOptionNames(int timeType, String[] routeInfo) {
 <link href="css/scrolling-nav.css" rel="stylesheet">
 <!-- Font Awesome CSS -->
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
-
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 <link rel="shortcut icon" href="/drawable/favicon.ico">
 <link href="css/routeinfo.css" rel="stylesheet">
 </style>
 </head>
 <script>
 	<%
-	String[] temp = new String[6];
-	temp[0] = tts[0].replace("&ensp;", " ");
-	if(tts.length == 2) temp[1] = tts[1].replace("&ensp;", " ");
-	else if(tts.length==4) {
-		temp[2] = tts[2].replace("&ensp;", " ");
-		temp[3] = tts[3].replace("&ensp;", " ");
-	}
-	else if(tts.length==3) {
-		temp[1] = tts[1].replace("&ensp;", " ");
-		temp[2] = tts[2].replace("&ensp;", " ");
-	}
-	else if(tts.length==6) {
-		temp[1] = tts[1].replace("&ensp;", " ");
-		temp[2] = tts[2].replace("&ensp;", " ");
-		temp[3] = tts[3].replace("&ensp;", " ");
-		temp[4] = tts[4].replace("&ensp;", " ");
-		temp[5] = tts[5].replace("&ensp;", " ");
-	}
 	if(isGbisError){
 	%>
 		alert("경기버스정보시스템 오류입니다. \n시간표 기능만 이용가능합니다. ");
 	<%
 	}
 	%>
-	function timepage(s) {
-		var url="timeinfo?routeId=<%=routeId%>&tableNo=";
-		if (s == 1 || s == "시간표") {
-			window
-					.open(
-							url+"1&title=<%=temp[0]%>",
-							"_self", "");
-		} else if (s == 2) {
-			window
-					.open(
-							url+"2&title=<%=temp[1]%>",
-							"_self", "");
-		} else if (s == 3) {
-			window
-					.open(
-							url+"3&title=<%=temp[2]%>",
-							"_self", "");
-		} else if (s == 4) {
-			window
-					.open(
-							url+"4&title=<%=temp[3]%>",
-							"_self", "");
-		} 
-		
-		
-		else {
-		}
-	}
+	
 </script>
 <body>
 	<!-- Navigation -->
@@ -196,7 +152,7 @@ public String[] timeOptionNames(int timeType, String[] routeInfo) {
 		</div>
       </div>
     </nav>
-	<div id="info_and_time" style="background-color: <%=routeColor%>;padding-top:80px;padding-bottom:30px;padding-right:10px;">
+	<div id="info_and_time" style="background-color: <%=routeColor%>;padding-top:80px;padding-bottom:15px;padding-right:10px;">
 		<p id="subtitle"><%=routeInfo[2]%>-<%=routeInfo[3]%></p>
 		<p id="info_fl_time">첫차:<%=routeInfo[4].substring(0, 5)%> | <%=routeInfo[5].substring(0, 5)%> 막차:<%=routeInfo[6].substring(0, 5)%> | <%=routeInfo[7].substring(0, 5)%></p>
 		<%
@@ -217,25 +173,41 @@ public String[] timeOptionNames(int timeType, String[] routeInfo) {
 					out.print("<p id='time'>운행종료");
 				%></p><%
 			}
-		}
+		}%>
+		<div style="height:38px;">
+		<%
 		if(colorName.equals("yellow")){
-			out.print("<button class=\"btn btn-sm \" style=\"color:white;background-color:"+routeColor+";border:1px;\" onclick='location.href=\"http://m.gbis.go.kr/search/getBusRouteDetail.do?routeId="+routeId+"&osInfoType=M\"')>실시간 위치</button>");		
+			out.print("<input type=\"button\" class=\"btn btn-outline-light\" style=\"float:right;\"onclick='location.href=\"http://m.gbis.go.kr/search/getBusRouteDetail.do?routeId="+routeId+"&osInfoType=M\"') value=\"실시간위치\"/>");		
 		}
-		else out.print("운행중인 버스: "+locationList.size()+"대");		
+		else out.print("<p style=\"display:inline;height:38px;\">운행중인 버스: "+locationList.size()+"대</p>");		
 		
 		if(isJoamBus){
 			if(tts.length == 1) {
-				out.print("<input type=\"button\" class=\"btn btn-outline-primary\" style=\"color:white;float:right;padding-right:5px;background-color:"+routeColor+";border:1px;\" value=\"시간표\" onclick=\"timepage(this.value)\" />");
+				%>
+				<input type="button" class="btn btn-outline-light" style="float:right;" value="시간표" onclick="javascript:window.open('timeinfo?routeId=<%=routeId%>&tableNo=1&title=<%=tts[0]%>', '_self');" />
+				<% 
 			}
 			else {
-				out.print("<select style=\"color:white;float:right;padding-right:5px;background-color:"+routeColor+";\" onchange=\"timepage(this.value)\">"+ 
-						"    <option>시간표</option>\r\n");
-				for(int i=0; i<tts.length; i++)
-					out.print("<option value="+(i+1)+" >"+tts[i]+"</option>");
-				out.print("</select>");
+				%>
+				<button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" style="float:right;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				    시간표
+				  </button>
+				  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				  <%
+				  for(int i=0; i<tts.length; i++){
+				  %>
+				  	<br>
+				    <a class="dropdown-item" href="timeinfo?routeId=<%=routeId%>&tableNo=<%=(i+1)%>&title=<%=tts[i].replace("&ensp;", " ")%>"><%=tts[i]%></a>
+				    <br>
+				   <%} %>
+				  </div>
+				
+				<%
+				
 			}
-		}
-		%>
+
+		}%>
+		</div>
 	</div>
 	<br>
 	<div class="container" style="position: relative; z-index: 1;">
@@ -248,8 +220,10 @@ public String[] timeOptionNames(int timeType, String[] routeInfo) {
 				if(i==0) fileName="start";
 				else if(i==routeStation.size()-1)fileName="end";
 				if(routeStation.get(i)[1].charAt(0)=='Y')fileName="turn";
+				String url = "stationinfo?stationId="+routeStation.get(i)[0]+"&stationMbId="+routeStation.get(i)[3]+"&stationName="+routeStation.get(i)[2];
+				if(url.contains("(경유)"))url="";
 				%>
-				<li><a href="stationinfo?stationId=<%=routeStation.get(i)[0]%>&stationMbId=<%=routeStation.get(i)[3]%>&stationName=<%=routeStation.get(i)[2]%>">
+				<li><a href="<%=url%>">
 					<table style="display: inline">
 						<tr height="25px">
 							<td id="sta_name"><%=routeStation.get(i)[2]%></td>

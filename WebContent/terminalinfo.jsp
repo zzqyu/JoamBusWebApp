@@ -29,7 +29,7 @@ body {
    
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #985e6d;" id="mainNav">
       <div class="container">
-        <a class="navbar-brand js-scroll-trigger" href="/">조암버스</a>
+        <a class="navbar-brand js-scroll-trigger" href="/" >조암버스</a>
         <p style="text-align:center; color:white; font-size:121%;margin-bottom:0;margin-right:0;"\>조암터미널 정보</p>
         <div class="" id="navbarSupportedContent"></div>
       </div>

@@ -15,15 +15,15 @@
 	    String routeItemHtml(String[] s, int type){
 	    	String answer = "<a class='list-group-item list-group-item-action' href='/routeinfo?routeId="+ s[0] + "'>"
 					+"<table><tbody><tr>"
-					+"<td rowspan='2'><img width='40px'"
+					+"<td rowspan='2'><img width='32px'"
 					+"		src='drawable/bus_"+StaticValue.RouteTypeToColorName(type+"").toLowerCase()+".PNG'></td>"
 					+"	<td rowspan='2' id='r_name'>"+s[1]+"</td>"
-					+"	<td id='r_start_sta'>"+s[2].replace("터미널", "");
+					+"	<td id='r_start_sta'>"+s[2].replace("터미널", "").replace("만세시장", "");
 					if(s[5].equals("N")) answer+="&lt;";
 					answer+="=&gt;"+s[3]+"</td></tr><tr>"
 					+"	<td id='r_end_sta'>";
 					if(s[5].equals("N"))answer+="&lt;";
-					answer+="=&gt;"+s[4].replace("터미널", "")+"</td></tr></tbody></table></a>";
+					answer+="=&gt;"+s[4].replace("터미널", "").replace("만세시장", "")+"</td></tr></tbody></table></a>";
 				return answer;
 	    }
     %>
@@ -35,8 +35,6 @@
 	        	for(String[] s: dbm.mainRouteList(11))
 	        		out.print(routeItemHtml(s, 11));
 				
-	        	for(String[] s: dbm.mainRouteList(43))
-	        		out.print(routeItemHtml(s, 43));
 				%>
 			</div>
 		</div>

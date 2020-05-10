@@ -11,6 +11,14 @@
 		<url-pattern>/main</url-pattern>
 	</servlet-mapping>
 	<servlet>
+		<servlet-name>favorite</servlet-name>
+		<jsp-file>/favorite.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>favorite</servlet-name>
+		<url-pattern>/favorite</url-pattern>
+	</servlet-mapping>
+	<servlet>
     <servlet-name>routeinfo</servlet-name>
     <jsp-file>/routeinfo.jsp</jsp-file>
   </servlet>
@@ -41,6 +49,14 @@
   <servlet-mapping>
     <servlet-name>timeinfo</servlet-name>
     <url-pattern>/timeinfo</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>sttimeinfo</servlet-name>
+    <jsp-file>/sttimeinfo.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>sttimeinfo</servlet-name>
+    <url-pattern>/sttimeinfo</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>timeinfo2</servlet-name>

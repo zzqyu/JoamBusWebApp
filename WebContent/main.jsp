@@ -29,7 +29,7 @@ new UpdateStationDBThread(request).start();*/
     @import url(//fonts.googleapis.com/earlyaccess/jejugothic.css);
 	body { background-color:#192231; font-family: 'Jeju Gothic', sans-serif;}
 	
-	#r_start_sta, #r_end_sta{font-size:90%;  width:100%;  color:#333333;}#r_start_sta{  padding-left:8px;}#r_end_sta{  padding-left:12%;}#r_name{  white-space:nowrap;  font-size:130%;  color:#000;  font-weight:bold;}
+	#r_start_sta, #r_end_sta{font-size:90%;  width:100%;  color:#333333;}#r_start_sta{  padding-left:8px;}#r_end_sta{  padding-left:12%;}#r_name{  white-space:nowrap;  font-size:120%;  color:#000;  font-weight:bold;}
     .bus_List{padding:10px 0 0 0;}
     header {
     padding: 56px 0 0px;
@@ -43,7 +43,12 @@ new UpdateStationDBThread(request).start();*/
 	a:visited { color: #f; text-decoration: none;}
  	a:hover { color: #f; text-decoration: underline;}
  	a:focus { color: #f; text-decoration: underline;}
-
+	.list-group-item{
+	padding-top: 0.75rem;
+    padding-right: 0.5rem;
+    padding-bottom: 0.75rem;
+    padding-left: 0.5rem;
+	}
     </style>
     
 </head>
@@ -52,7 +57,7 @@ new UpdateStationDBThread(request).start();*/
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #985e6d;" id="mainNav">
       <div class="container">
-        <a class="navbar-brand js-scroll-trigger" href="/">조암버스</a>
+        <a class="navbar-brand js-scroll-trigger" href="" onclick="javascript:location.replace('/')">조암버스</a>
         
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -60,7 +65,7 @@ new UpdateStationDBThread(request).start();*/
          <div class="collapse navbar-collapse"  id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
           	<li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#menu">메뉴</a>
+              <a class="nav-link js-scroll-trigger" href="#menu" >메뉴</a>
             </li>
             <li class="nav-item">
               <a class="nav-link js-scroll-trigger" href="#siwoe">광역버스</a>
@@ -76,6 +81,8 @@ new UpdateStationDBThread(request).start();*/
       </div>
     </nav>
 	<header id="menu" style="background-color: #494e6b;">
+	
+	
 		<%
 		boolean isMobile = false;
 		String agent = request.getHeader("USER-AGENT");
@@ -134,7 +141,7 @@ new UpdateStationDBThread(request).start();*/
 				<a href="/buspay.jsp" class="card bg-dark col-6 col-sm-3">
 					<br><br>버스 요금표
 				</a>
-				<a href="/" class="card bg-dark col-6 col-sm-3">
+				<a href="/#" class="card bg-dark col-6 col-sm-3">
 					<br><br>
 				</a>
 				<a href="/terminalinfo.jsp" class="card bg-dark col-6 col-sm-3">
@@ -144,8 +151,8 @@ new UpdateStationDBThread(request).start();*/
 					class="card bg-dark col-6 col-sm-3"><br> <br>홈페이지 정보</a>
 			</div>
 		</div>
-		
 	</header>
+	
 	
 	<%
 	//변수 선언
@@ -206,6 +213,8 @@ new UpdateStationDBThread(request).start();*/
 	    <!-- /.container -->
   	</footer>
 	<%=StaticValue.AD%>
+	
+	
     <!-- Bootstrap core JavaScript -->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -228,7 +237,7 @@ new UpdateStationDBThread(request).start();*/
     function Enter_Check(keyword){
         // 엔터키의 코드는 13입니다.
 	    if(event.keyCode == 13){
-	    	window.open("?type=<%=type%>&keyword="+ encodeURI(encodeURIComponent(keyword)),"_self")
+	    	location.replace("?type=<%=type%>&keyword="+ encodeURI(encodeURIComponent(keyword)))
 	    }
 	}
 </script>

@@ -1,4 +1,8 @@
-<%@ page import="joambuswebapp.*" %>
+<%@page import="java.util.Calendar"%>
+<%@page import="java.util.TimeZone"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="java.util.Map"%>
+<%@page import="joambuswebapp.*" %>
 <%@page import="java.util.Arrays"%>
 <%@page import="org.w3c.dom.*"%>
 <%@page import="java.net.*"%>
@@ -14,9 +18,17 @@
 	//String stationName = new String(request.getParameter("stationName").getBytes("8859_1"), "UTF-8"); //정류장 이름
 	String stationName = new String(request.getParameter("stationName")); //정류장 이름
 	
+	TimeZone kst = TimeZone.getTimeZone ("JST"); 
+	// 주어진 시간대에 맞게 현재 시각으로 초기화된 GregorianCalender 객체를 반환.
+	Calendar cal = Calendar.getInstance ( kst );  
+	int HH = cal.get(Calendar.HOUR_OF_DAY);
+	int MM = cal.get(Calendar.MINUTE);
+	String time = HH+":"+((MM<10)?"0"+MM:MM);
+	
 
 	DBManager dbm = new DBManager("JOAMBUS");
-	
+	Map<String, ArrayList<String[]>> stt = new HashMap<>();
+	stt = dbm.stationOfTimetableOrderbyStart(stationId, StaticValue.isHoliday(true), time);
 %>
 
 <!DOCTYPE html>
@@ -34,7 +46,8 @@
 <link href="css/scrolling-nav.css" rel="stylesheet">
 <!-- Font Awesome CSS -->
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
-
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 <style>  
 @import url(//fonts.googleapis.com/earlyaccess/jejugothic.css);  
  
@@ -47,10 +60,6 @@ body {
 }  
 .card {color:#ffffff; width: 100%; height: 7rem; }
  
-
-#list{  
-	padding-top: 80px;  
-}  
 header {  
 	padding-top:0px;  
 	padding-bottom: 5px;  
@@ -73,20 +82,43 @@ header {
 }  
 #s_name, #r_start_sta, #r_end_sta{font-size:150%; font-style:bold; color:#333333;}#s_name,#s_mbno,#r_start_sta{  padding-left:8px;}#r_end_sta{  padding-left:20%;}#r_name{  white-space:nowrap;  font-size:150%;  color:#000;  font-weight:bold;}
     .bus_List{padding:10px;}
+    
+
+
 </style>
 </head>
 <body>
 	<!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #985e6d;" id="mainNav">
       <div class="container">
-        <a class="navbar-brand js-scroll-trigger" href="/">조암버스</a>
-        <p style="text-align:center; color:white; font-size:121%;margin-bottom:0;margin-right:75px;"\><%=stationName+"("+stationMbId+")"%></p>
+        <a class="navbar-brand js-scroll-trigger" href="/" style="font-size:125%;">조암버스</a>
+        <p style="text-align:center; color:white; font-size:100%;margin-bottom:0;margin-right:30px;"><%=stationName+"("+stationMbId.trim()+")"%></p>
         <!-- Collapsible content -->
 	    <div class="" id="navbarSupportedContent">
 	        
 		</div>
       </div>
     </nav>
+    <div style="color:#fff;background-color: #985e6d; padding-top:80px;padding-bottom:10px;">
+    	<table style="margin-left: auto; margin-right: auto;">
+    		<tbody style="line-height:0%">
+	    		<%
+				//int cnt1 = 0;
+				for( String key:stt.keySet()){%>
+    			<tr style="font-size:16pt;line-height:40%">
+    			<td style="font-size:10pt;vertical-align:top;float:left;text-align:right;line-height:100%"><%=key%><br>출발</td>
+    			<%for(String[] row:stt.get(key)){%>
+					<td><%=row[0]%><br><br><p style="font-size:10pt"><%=row[2]%></p></td>
+				<%}%>
+    			</tr>
+    			<%}%>
+    		</tbody>
+    	</table>
+    	<div style="height:38px;">
+    	<a style="color:#fff;" href="/sttimeinfo?stationId=<%=stationId%>&title=<%=stationName %>"><button type="button" class="btn btn-outline-light" style="float:right;margin-right:8px" data-toggle="modal" data-target="#exampleModalCenter">시간표</button></a>
+    	</div>
+    	
+	</div>
 	<div id="list" class="container bus_List">
 		<header id=header><p>운행중인 버스</p></header>
 		<div class="list-group">
@@ -158,7 +190,7 @@ header {
 					gbisRouteList.remove(arriveRouteId);
 				}
 				//50-1추가
-				
+				gbisRouteList.addAll(dbm.localRouteSelectAtStation(stationId));
 				//리스트로 표출하기
 				for(String gbisRouteId: gbisRouteList) {
 					String routeId, routeTypeCd, routeName, startStationName, middleStationName, endStationName, direction;
@@ -184,6 +216,7 @@ header {
 					routeName = routeInfo[1];
 					startStationName = routeInfo[2];
 					endStationName = routeInfo[3];
+					if(routeTypeCd.equals("30")) routeName+="(실시간 미지원)";
 					out.print("<a class='list-group-item list-group-item-action' "+
 			    			"href='routeinfo.jsp?routeId="+gbisRouteId+"'><table>"+
 							"<tbody><tr>"+
@@ -210,15 +243,50 @@ header {
       <!-- /.container -->
     </footer>
 	<%=StaticValue.AD%>
+	
+	<!-- Modal -->
+	<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLongTitle">시간표 로딩 중...</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onClick="history.go(0)">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	        <div class="spinner-border"></div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal" onClick="history.go(0)">Close</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	
+	
+	
+	
+	
+	
 	<!-- Bootstrap core JavaScript -->
     <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <!-- Plugin JavaScript -->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
     <!-- Custom JavaScript for this theme -->
     <script src="js/scrolling-nav.js"></script>
+    <script type="text/javascript">
+    
+    var _showPage = function() {
+    	  var loader = $("div.loader");
+    	  var container = $("div.container");
+    	  loader.css("display","none");
+    	  container.css("display","block");
+    	};
+    </script>
 </body>
 </html>
 

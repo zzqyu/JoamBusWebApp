@@ -3,6 +3,7 @@ package joambuswebapp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
@@ -17,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,6 +29,11 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -53,12 +60,12 @@ public class StaticValue {
     public final static String SERVER_URL_TIME = "/routetime";
     public final static String SERVER_URL_APP = "/appfile";
     public final static String AD = "<div style=\"position:fixed;z-index: 3; background:#192231; padding-top:0px; bottom:-8px;left:0px;width:100%;\">\r\n" + 
-    		"	<ins id=\"name\" class=\"daum_ddn_area\" data-ad-unit=\"DAN-tol7l6smt92u\" data-ad-media=\"5l5\" data-ad-pubuser=\"l7\" data-ad-type=\"A\" data-ad-width=\"320\" data-ad-height=\"50\" data-ad-onfail=\"callBackFunc\" data-ad-init=\"done\" data-ad-status=\"done\" data-viewable-checker-id=\"I6C5Si\">\r\n" + 
-    		"		 <iframe name=\"easyXDM_default7856_provider\" id=\"name_ifrm\" marginwidth=\"0\" marginheight=\"0\" frameborder=\"0\" width=\"100%\" height=\"50\" scrolling=\"no\" src=\"https://display.ad.daum.net/sdk/web?slotid=DAN-tol7l6smt92u&amp;amp;surl=https%3A%2F%2Fjoambusapp.azurewebsites.net%2Fmain&amp;amp;eid=name&amp;amp;containerid=name#xdm_e=https%3A%2F%2Fjoambusapp.azurewebsites.net&amp;amp;xdm_c=default7856&amp;amp;xdm_p=1\" style=\"display: block; border: 0px; margin: 0px auto; min-width: 320px; min-height: 50px;\">\r\n" + 
-    		"        </iframe>\r\n" + 
-    		"    </ins>\r\n" + 
+    		"<ins class=\"kakao_ad_area\" style=\"display:none;\" \r\n" + 
+    		"	 data-ad-unit    = \"DAN-tol7l6smt92u\" \r\n" + 
+    		"	 data-ad-width   = \"320\" \r\n" + 
+    		"	 data-ad-height  = \"50\"></ins> " + 
     		"</div>" + 
-			"<script type=\"text/javascript\" src=\"//t1.daumcdn.net/adfit/static/ad.min.js\"></script>";
+    		"<script type=\"text/javascript\" src=\"//t1.daumcdn.net/kas/static/ba.min.js\" async></script>";
     
     
     public final static String[] MAIN_SERVLET_TABLE_TAGS = {"routeName","routeId","startStationName","middleStationName","endStationName", "routeTypeCd", "isOneWay"};
@@ -272,24 +279,43 @@ public class StaticValue {
 	
 	
 	
-	public static boolean isHoliday() throws Exception {
+	public static boolean isHoliday(boolean isAddSat) throws Exception {
 		TimeZone kst = TimeZone.getTimeZone ("JST"); 
 		Calendar cal = Calendar.getInstance ( kst ); 
 		int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-		if(DayOfWeek.of(dayOfWeek) == DayOfWeek.SATURDAY || DayOfWeek.of(dayOfWeek) == DayOfWeek.SUNDAY) {
+		if((isAddSat && DayOfWeek.of(dayOfWeek) == DayOfWeek.SATURDAY) || DayOfWeek.of(dayOfWeek) == DayOfWeek.SUNDAY) {
 			return true;
 		}
-		String u = DAY_URL+"solYear="+cal.get(Calendar.YEAR)+"&solMonth="+((cal.get(Calendar.MONTH)+1<10)?"0":"")+(cal.get(Calendar.MONTH)+1);
-		String today = cal.get(Calendar.YEAR)+((cal.get(Calendar.MONTH)<10)?"0":"")+((cal.get(Calendar.MONTH)+1<10)?"0":"")+(cal.get(Calendar.MONTH)+1)+cal.get(Calendar.DATE);
+		String u = DAY_URL+"solYear="+ new SimpleDateFormat ("yyyyMM").format(cal.getTime());
+		String today = new SimpleDateFormat ("yyyyMMdd").format(cal.getTime());
         System.out.println(today);
+        System.out.println(u);
 		URL url = new URL(u);
 		URLConnection connection = url.openConnection();
 		connection.setReadTimeout(15000);
 		Document doc = StaticValue.parseXML(connection.getInputStream());
 		NodeList descNodes = doc.getElementsByTagName("locdate");
+		
+		TransformerFactory tf = TransformerFactory.newInstance();
+
+		Transformer transformer = tf.newTransformer();
+
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+
+		StringWriter writer = new StringWriter();
+
+		transformer.transform(new DOMSource(doc), new StreamResult(writer));
+
+		String output = writer.getBuffer().toString();
+
+		System.out.println(output);
+
+
 		if(descNodes==null) return false;
 		for (int i = 0; i < descNodes.getLength(); i++) {
-			if(today.equals(descNodes.item(i).getTextContent())) 
+			String day = descNodes.item(i).getTextContent();
+			
+			if(today.equals(day)) 
 				return true;
 		}
 		return false;

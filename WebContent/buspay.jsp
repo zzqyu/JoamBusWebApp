@@ -59,8 +59,8 @@ header {
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #985e6d;" id="mainNav">
       <div class="container">
-        <a class="navbar-brand js-scroll-trigger" href="/">조암버스</a>
-        <p style="text-align:center; color:white; font-size:121%;margin-bottom:0;margin-right:75px;"\>버스요금표</p>
+        <a class="navbar-brand js-scroll-trigger" href="/" >조암버스</a>
+        <p style="text-align:center; color:white; font-size:121%;margin-bottom:0;margin-right:75px;">버스요금표</p>
 	    <div class="" id="navbarSupportedContent"></div>
       </div>
     </nav>  
@@ -149,9 +149,9 @@ header {
 	<a class='list-group-item list-group-item-action' ><table  border=0 align="center">
 		<tr>
 			<td>현금</td>
-			<td>1250</td>
-			<td>900</td>
-			<td>600</td>
+			<td>1400</td>
+			<td>1000</td>
+			<td>700</td>
 		</tr>
 		
 	</table></a>
@@ -159,14 +159,15 @@ header {
 	<a class='list-group-item list-group-item-action' ><table  border=0 align="center">
 		<tr>
 			<td>카드</td>
-			<td>1150</td>
-			<td>810</td>
-			<td>580</td>
+			<td>1350</td>
+			<td>950</td>
+			<td>680</td>
 		</tr>
 	</table></a>
 	
 		
-	</div><%=StaticValue.AD%>
+	</div>
+	<%=StaticValue.AD%>
 	
  <!-- Bootstrap core JavaScript -->
  <script src="vendor/jquery/jquery.min.js"></script>
