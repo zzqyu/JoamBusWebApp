@@ -74,7 +74,7 @@ new UpdateStationDBThread(request).start();*/
               <a class="nav-link js-scroll-trigger" href="#sinae">시내버스</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#maeul">마을/따복버스</a>
+              <a class="nav-link js-scroll-trigger" href="#maeul">마을버스</a>
             </li>
           </ul>
         </div>
@@ -96,14 +96,15 @@ new UpdateStationDBThread(request).start();*/
 			}
 		}
 		if(isMobile){ %>
-	    <div class="bd-example">
+	    <div class="bd-example" >
 			<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
 			  <ol class="carousel-indicators">
 			    <li data-target="#carouselExampleIndicators" data-slide-to="0" class=""></li>
 			    <li data-target="#carouselExampleIndicators" data-slide-to="1" class=""></li>
-			    <li data-target="#carouselExampleIndicators" data-slide-to="2" class="active"></li>
+			    <li data-target="#carouselExampleIndicators" data-slide-to="2" class=""></li>
+			    <li data-target="#carouselExampleIndicators" data-slide-to="3" class="active"></li>
 			  </ol>
-			  <div class="carousel-inner">
+			  <div class="carousel-inner" style="height:170px;">
 			    <div class="carousel-item">
 			    <a href="https://m.search.naver.com/search.naver?display=15&page=2&query=%EC%A1%B0%EC%95%94%EB%B2%84%EC%8A%A4&sm=mtb_pge&start=1&where=m">
 			      <img class="d-block w-100"  src="drawable/banner1.jpg" data-holder-rendered="true">
@@ -114,10 +115,21 @@ new UpdateStationDBThread(request).start();*/
 			      <img class="d-block w-100"  src="drawable/banner2.jpg" data-holder-rendered="true">
 			      </a>
 			    </div>
-			    <div class="carousel-item active">
+			    <div class="carousel-item">
 			    	<a href="https://play.google.com/store/apps/details?id=com.dolapps.bank_noti_widget">
 			      <img class="d-block w-100"  src="drawable/banner3.jpg" data-holder-rendered="true">
 			      </a>
+			    </div>
+			    
+			    <div class="carousel-item active" >
+			    	<ins class="kakao_ad_area" 
+					 data-ad-unit    = "DAN-qe9c5ji364hl" 
+					 data-ad-width   = "320" 
+					 data-ad-height  = "100"></ins> 
+					 <ins class="kakao_ad_area" style="display:none;" 
+					 data-ad-unit    = "DAN-1if117ellqk34" 
+					 data-ad-width   = "320" 
+					 data-ad-height  = "50"></ins> 
 			    </div>
 			    
 			  </div>

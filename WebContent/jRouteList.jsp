@@ -51,7 +51,7 @@
 	
 	
 		<div id="maeul"class="bus_List">
-			<p class="lead text-light">마을/따복버스</p>
+			<p class="lead text-light">마을버스</p>
 			<div class="list-group">
 				<%
 	        	for(String[] s: dbm.mainRouteList(15))

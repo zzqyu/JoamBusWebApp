@@ -20,7 +20,7 @@ public class DBManager {
     //static String DB_NAME = "joambusdb";
 	//127.0.0.1:50344
 	//본 서버
-    //static String SQL_URL = "jdbc:mysql://127.0.0.1:49431/";
+    //static String SQL_URL = "jdbc:mysql://127.0.0.1:50589/";
 
 	//예비 서버
 	//static String SQL_URL = "jdbc:mysql://127.0.0.1:55863/";
@@ -317,8 +317,14 @@ public class DBManager {
 		ArrayList<String[]> answer = new ArrayList<>();
 		String where = " AND t.IS_WEEKEND=\"N\" ";
 		if(isWeekend)where = " AND (t.IS_WEEKEND=\"Y\" OR (not exists (select IS_WEEKEND from joambus.time_table where ROUTE_ID=rs.ROUTE_ID AND IS_WEEKEND=\"Y\"))) ";
-		String sql = "SELECT t.TIME, rs.ROUTE_ID, rs.ROUTE_NM, CASE WHEN is_up = 'Y' THEN r.ST_STA_NM ELSE r.ED_STA_NM END AS `출발지`,CASE WHEN rs.STA_ORDER >= (select STA_ORDER from joambus.routestation where ROUTE_ID=r.ROUTE_ID and STATION_ID=r.ED_STA_ID limit 1) THEN  r.ST_STA_NM ELSE r.ED_STA_NM END AS `도착지`" + 
-				" FROM joambus.time_table as t, joambus.routestation as rs, joambus.route as r " + 
+		String sql = "SELECT t.TIME, rs.ROUTE_ID, rs.ROUTE_NM, "+
+				" CASE WHEN is_up = 'Y' THEN r.ST_STA_NM ELSE r.ED_STA_NM END AS `출발지`,"+
+				
+				" CASE WHEN EXISTS(select * from joambus.time_table where IS_UP=\"N\") THEN /*상하행 둘다*/(CASE WHEN UPDOWN = 'N' THEN r.ST_STA_NM ELSE r.ED_STA_NM END) ELSE/*상행만*/(CASE WHEN UPDOWN = 'N' THEN r.ST_STA_NM ELSE r.ED_STA_NM END) END AS `도착지`   " + 
+				/*" CASE WHEN EXISTS(select * from joambus.time_table where IS_UP=\"N\")  THEN  r.ST_STA_NM ELSE r.ED_STA_NM END AS `도착지` " +*/ 
+				/*" CASE WHEN rs.STA_ORDER >= (select STA_ORDER from joambus.routestation where ROUTE_ID=r.ROUTE_ID and STATION_ID=r.ED_STA_ID limit 1) THEN  r.ST_STA_NM ELSE r.ED_STA_NM END AS `도착지`" + */
+				
+				" FROM joambus.time_table as t, (select ROUTE_ID, STATION_ID, UPDOWN, ROUTE_NM from joambus.routestation) as rs, (select ROUTE_ID, ST_STA_NM, ED_STA_NM from joambus.route) as r  " + 
 				" WHERE rs.STATION_ID="+stationId+
 				" AND rs.ROUTE_ID!=233000139 AND rs.ROUTE_ID!=233000271 AND rs.ROUTE_ID=t.ROUTE_ID AND r.ROUTE_ID=t.ROUTE_ID"+
 				where+
@@ -347,8 +353,14 @@ public class DBManager {
 		String timeSql = " AND t.TIME >= \""+time+"\"";
 		if(time==null) timeSql="";
 		if(isWeekend)where = " AND (t.IS_WEEKEND=\"Y\" OR (not exists (select IS_WEEKEND from joambus.time_table where ROUTE_ID=rs.ROUTE_ID AND IS_WEEKEND=\"Y\")))";
-		String sql = "SELECT t.TIME, rs.ROUTE_ID, rs.ROUTE_NM, CASE WHEN is_up = 'Y' THEN r.ST_STA_NM ELSE r.ED_STA_NM END AS `출발지`,CASE WHEN rs.STA_ORDER >= (select STA_ORDER from joambus.routestation where ROUTE_ID=r.ROUTE_ID and STATION_ID=r.ED_STA_ID limit 1) THEN  r.ST_STA_NM ELSE r.ED_STA_NM END AS `도착지`" + 
-				" FROM joambus.time_table as t, joambus.routestation as rs, joambus.route as r" + 
+		String sql = "SELECT t.TIME, rs.ROUTE_ID, rs.ROUTE_NM, "+
+				" CASE WHEN is_up = 'Y' THEN r.ST_STA_NM ELSE r.ED_STA_NM END AS `출발지`,"+
+				
+				" CASE WHEN EXISTS(select * from joambus.time_table where IS_UP=\"N\") THEN /*상하행 둘다*/(CASE WHEN UPDOWN = 'N' THEN r.ST_STA_NM ELSE r.ED_STA_NM END) ELSE/*상행만*/(CASE WHEN UPDOWN = 'N' THEN r.ST_STA_NM ELSE r.ED_STA_NM END) END AS `도착지`  " + 
+				/*" CASE WHEN EXISTS(select * from joambus.time_table where IS_UP=\"N\")  THEN  r.ST_STA_NM ELSE r.ED_STA_NM END AS `도착지` " +*/ 
+				/*" CASE WHEN rs.STA_ORDER >= (select STA_ORDER from joambus.routestation where ROUTE_ID=r.ROUTE_ID and STATION_ID=r.ED_STA_ID limit 1) THEN  r.ST_STA_NM ELSE r.ED_STA_NM END AS `도착지`" +*/ 
+
+				" FROM joambus.time_table as t, (select ROUTE_ID, STATION_ID, UPDOWN, ROUTE_NM from joambus.routestation) as rs, (select ROUTE_ID, ST_STA_NM, ED_STA_NM from joambus.route) as r  " + 
 				" WHERE rs.STATION_ID="+stationId+
 				" AND rs.ROUTE_ID!=233000139 AND rs.ROUTE_ID!=233000271 AND rs.ROUTE_ID=t.ROUTE_ID AND r.ROUTE_ID=t.ROUTE_ID"+
 				where+

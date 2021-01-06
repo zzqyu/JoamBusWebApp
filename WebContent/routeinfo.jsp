@@ -12,8 +12,8 @@
 	int routeId = Integer.parseInt(request.getParameter("routeId"));
 	//유형, 이름, 기점, 종점, 기점첫차, 종점첫차, 기점막차, 종점막차
 	String[] routeInfo = dbm.routeInfo(routeId);
-	isJoamBus = routeInfo[8]!=null;
-	/*if(routeInfo==null) { 
+	
+	if(routeInfo==null) { 
 		isJoamBus = false;
 		System.out.println("없는 노선");
 		routeInfo = dbm.gbisRouteInfo(routeId);
@@ -31,20 +31,49 @@
 				e.printStackTrace();
 			}
 		}
-	}*/
+	}
+	
+	else isJoamBus = routeInfo[8]!=null;
+	
 	String routeColor = StaticValue.RouteTypeToColor(routeInfo[0]);
 	String colorName = StaticValue.RouteTypeToColorName(routeInfo[0]).toLowerCase();
-	int timeType=dbm.haveTimeType(routeId);
-	ArrayList<ArrayList<String>> timeTable = dbm.curTimeTable(routeId,timeType);
-	//ArrayList<String[]> routeStation = dbm.routeStationList(routeId);
-	ArrayList<String[]> routeStation = new ArrayList<String[]>();
-	ArrayList<String[]> locationList = new ArrayList<String[]>();
+	String[] tts=null; 
+	ArrayList<String[]> locationList=null ,routeStation=null;
+	ArrayList<ArrayList<String>> timeTable=null;
+	int timeType;
 	try{
-		if(routeStation.isEmpty())routeStation = StaticValue.getRouteStationList(routeId);
+		timeType=dbm.haveTimeType(routeId);
+		timeTable = dbm.curTimeTable(routeId,timeType);
+		//ArrayList<String[]> routeStation = dbm.routeStationList(routeId);
+		routeStation = new ArrayList<String[]>();
+		locationList = new ArrayList<String[]>();
+		if(routeStation.isEmpty()){
+			routeStation = StaticValue.getRouteStationList(routeId);
+
+			for(int i = 0; i < routeStation.size(); i++ ){
+				String[] row = routeStation.get(i);
+				System.out.print("\""+routeId+"\",");
+				System.out.print("\""+row[0]+"\",");//sid
+				System.out.print("\""+row[1]+"\",");//updown
+				System.out.print("\""+(i+1)+"\",");//order
+				System.out.print("\""+routeInfo[1]+"\",");//route_NM
+				System.out.println("\""+row[2]+"\"");//updown
+
+				/*for(String item: row)System.out.print("\""+item+"\",");
+				System.out.println();*/
+			}
+
+		}
 		locationList = StaticValue.getBusLocationList(routeId);
-	}catch(GbisException e){
+		tts = timeOptionNames(timeType, routeInfo);
+	}
+	catch(GbisException e){
 		isGbisError = true;
 	}
+	catch(Exception e){
+		e.printStackTrace();
+	}
+
 	
 	//stationSeq, endBus, lowPlate, plateNo, plateType, remainSeatCnt, routeId+"", stationId
 	//정류장id, 반환점, 정류장이름, 정류장모바일번호
@@ -53,7 +82,7 @@
 	timetable -> 테이블종류, 당일 시간표
 	*/
 	
-	String[] tts = timeOptionNames(timeType, routeInfo);
+	
 %>
 <%!
 public String[] timeOptionNames(int timeType, String[] routeInfo) {
