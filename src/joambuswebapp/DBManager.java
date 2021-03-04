@@ -20,13 +20,13 @@ public class DBManager {
     //static String DB_NAME = "joambusdb";
 	//127.0.0.1:50344
 	//본 서버
-    //static String SQL_URL = "jdbc:mysql://127.0.0.1:50589/";
+    static String SQL_URL = "jdbc:mysql://127.0.0.1:50589/";
 
 	//예비 서버
 	//static String SQL_URL = "jdbc:mysql://127.0.0.1:55863/";
 	
 	//로컬 서버
-	static String SQL_URL = "jdbc:mysql://127.0.0.1:3306/";
+	//static String SQL_URL = "jdbc:mysql://127.0.0.1:3306/";
     static String SQL_CLASS_NAME = "com.mysql.jdbc.Driver";
 
     private Connection conn;
@@ -70,12 +70,17 @@ public class DBManager {
 				"FROM ROUTE AS R, STATION AS S  \r\n" + 
 				"WHERE R.TYPE = " + type + " AND R.START_STATION=S.ID "+
 				"order by CAST(REPLACE(REPLACE(R.NAME, '[^0-9|-]', ''), '-', '.') AS DECIMAL(10,6));";*/
-		String sql = "SELECT R.ROUTE_ID ,R.ROUTE_NM, S.STATION_NM, R.MID_STATION, (SELECT STATION_NM FROM JOAMBUS.STATION WHERE STATION_ID=R.ED_STA_ID), R.IS_ONEWAY\r\n" + 
+		/*String sql = "SELECT R.ROUTE_ID ,R.ROUTE_NM, S.STATION_NM, R.MID_STATION, (SELECT STATION_NM FROM JOAMBUS.STATION WHERE STATION_ID=R.ED_STA_ID), R.IS_ONEWAY\r\n" + 
 				"				FROM JOAMBUS.ROUTE AS R, JOAMBUS.STATION AS S  \r\n" + 
 				"				WHERE R.ROUTE_TP =  " + type + " \r\n" + 
 				"                AND R.ST_STA_ID=S.STATION_ID \r\n" + 
 				"                AND R.IS_ONEWAY IS NOT NULL\r\n" + 
-				"				order by CAST(REPLACE(REPLACE(R.ROUTE_NM, '[^0-9|-]', ''), '-', '.') AS DECIMAL(10,6));";
+				"				order by CAST(REPLACE(REPLACE(R.ROUTE_NM, '[^0-9|-]', ''), '-', '.') AS DECIMAL(10,6));";*/
+		String sql = "SELECT ROUTE_ID , ROUTE_NM, ST_STA_NM, MID_STATION, ED_STA_NM, IS_ONEWAY\r\n"
+				+ "FROM JOAMBUS.ROUTE\r\n"
+				+ "WHERE ROUTE_TP =  " + type + " \r\n" 
+				+ "AND IS_ONEWAY IS NOT NULL\r\n"
+				+ "order by CAST(REPLACE(REPLACE(REPLACE(ROUTE_NM, 'H', '0.'), '[^0-9|-]', ''), '-', '.') AS DECIMAL(10,6));";
 		System.out.println(sql.toUpperCase());
 		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
 		while (rs.next()) {
@@ -89,14 +94,14 @@ public class DBManager {
 		/*String sql = "SELECT R.TYPE, R.NAME, S.NAME as 'START',(SELECT NAME FROM STATION WHERE ID=R.END_STATION) AS 'END', R.START_FIRST, R.END_START, R.START_LAST, R.END_LAST \r\n" + 
 				"FROM ROUTE AS R, JOAMBUS.STATION AS S  \r\n" + 
 				"WHERE R.ID = "+id+" AND R.START_STATION=S.ID;";*/
-		String sql = "SELECT R.ROUTE_TP, R.ROUTE_NM, S.STATION_NM AS 'START',(SELECT STATION_NM FROM JOAMBUS.STATION WHERE STATION_ID=R.ED_STA_ID) AS 'END', R.UP_FIRST_TIME, R.UP_LAST_TIME, R.DOWN_FIRST_TIME, R.DOWN_LAST_TIME, R.IS_ONEWAY \r\n" + 
+		String sql = "SELECT R.ROUTE_TP, R.ROUTE_NM, S.STATION_NM AS 'START',(SELECT STATION_NM FROM JOAMBUS.STATION WHERE STATION_ID=R.ED_STA_ID) AS 'END', R.UP_FIRST_TIME, R.UP_LAST_TIME, R.DOWN_FIRST_TIME, R.DOWN_LAST_TIME, R.IS_ONEWAY, R.PEEK_ALLOC, R.NPEEK_ALLOC \r\n" + 
 				"FROM JOAMBUS.ROUTE AS R, JOAMBUS.STATION AS S  \r\n" + 
 				"WHERE R.ROUTE_ID = "+id+" AND R.ST_STA_ID=S.STATION_ID;";
 		System.out.println(sql.toUpperCase());
 		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
 		while (rs.next()) {
 			answer = new String[] {rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4)
-					, rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9)};
+					, rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9), rs.getString(10), rs.getString(11)};
 			break;
     	}
 		return answer;
@@ -105,40 +110,46 @@ public class DBManager {
 			throws SQLException, UnsupportedEncodingException {
 		String[] answer = null;
 		String sql = "SELECT ROUTE_TP, ROUTE_NM, ST_STA_NM,\r\n" + 
-				"ED_STA_NM, UP_FIRST_TIME, DOWN_FIRST_TIME, UP_LAST_TIME, DOWN_LAST_TIME \r\n" + 
+				"ED_STA_NM, UP_FIRST_TIME, DOWN_FIRST_TIME, UP_LAST_TIME, DOWN_LAST_TIME, PEEK_ALLOC, NPEEK_ALLOC \r\n" + 
 				"FROM JOAMBUS.ROUTE\r\n" + 
 				"WHERE ROUTE_ID = "+id+";";
 		System.out.println(sql.toUpperCase());
 		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
 		while (rs.next()) {
 			answer = new String[] {rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4)
-					, rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8)};
+					, rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), null,rs.getString(9),rs.getString(10)};
 			break;
     	}
 		return answer;
 	}
 	
 	public int haveTimeType(int id) throws SQLException, UnsupportedEncodingException {
-		String sql = "SELECT IS_WEEKEND , IS_UP\r\n" + 
-				"FROM JOAMBUS.TIME_TABLE \r\n" + 
-				"where ROUTE_ID='"+id+"'\r\n" + 
-				"group by IS_WEEKEND, IS_UP;";
-		System.out.println(sql.toUpperCase());
+		String sql="SELECT count(distinct IS_WEEKEND) as `weekday`, count(distinct IS_UP) as `up`\r\n"
+				+ "FROM JOAMBUS.TIME_TABLE \r\n"
+				+ "WHERE ROUTE_ID='"+id+"';";
+		
 		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
-		int weekday=1, up=1;
-		char wKeyWord='N', uKeyWord='Y';
+		System.out.println(sql.toUpperCase());
+		int weekday = 0, up=0;
 		boolean isSat = false;
+		int answer=0;
 		while (rs.next()) {
-			if(weekday==1 && rs.getString(1).charAt(0)=='Y') weekday++;
-			if(up==1 && rs.getString(2).charAt(0)=='N') up++;
-			if(rs.getString(1).charAt(0)=='S') isSat =true;
-    	}
-		int answer=1;
-		if(weekday==2 && up==1)answer+=1;
+			weekday = rs.getInt("weekday");
+			up = rs.getInt("up");
+		}
+		isSat =(weekday>2);
+		System.out.println("asdasdas "+weekday + " " + up);
+		if(weekday==0 && up==0)answer = 0;
+		else {
+			answer = ((up-1)<<1) + ((weekday-1)) + 1;
+			if(isSat) answer=5;
+			if(answer==5 && up==2) answer++;
+		}
+		/*if(weekday==1 && up==1)answer = 1;
+		else if(weekday==2 && up==1)answer = 2;
 		else if(weekday==1 && up==2)answer+=2;
-		else if(weekday==2 && up==2)answer+=3;
-		if(isSat) answer=5;
-		if(answer==5 && up==2) answer++;
+		else if(weekday==2 && up==2)answer+=3;*/
+		
 		return answer;
 	}
 	public ArrayList<ArrayList<String>> curTimeTable(int id, int timeType) throws Exception {
@@ -243,7 +254,7 @@ public class DBManager {
 		
 		return answer;
 	}
-	public ArrayList<String> timeTableList(int id, int type)
+	public ArrayList<String> timeTableList(int id, int type) 
 			throws SQLException, UnsupportedEncodingException {
 		ArrayList<String> answer = new ArrayList<>();
 		char up='Y', weekend='N';
@@ -331,18 +342,18 @@ public class DBManager {
 				" AND (t.IS_UP=rs.UPDOWN OR (t.IS_UP!=rs.UPDOWN AND not exists (select IS_UP from joambus.time_table where ROUTE_ID=rs.ROUTE_ID AND IS_UP=\"N\"))) " + 
 				" ORDER BY t.TIME;";
 		System.out.println(sql);
-		String[] routeNms= {"50-1","2000"};
+		//String[] routeNms= {"50-1","2000"};//공휴일 있는 노선 확인 용
 		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
 		while(rs.next()){//시간, rID, 노선명, 시간표기준지, 방향
         	answer.add(new String[] {rs.getString(1).substring(0, 5), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5)});
-        	if(refHoliVisible!=null && !refHoliVisible[0]) {
+        	/*if(refHoliVisible!=null && !refHoliVisible[0]) {
         		for(String nm: routeNms) {
         			if(rs.getString(3).contains(nm)) {
         				refHoliVisible[0] = true;
         				break;
         			}
         		}
-        	}
+        	}*/
         }
 		return answer;
 	}

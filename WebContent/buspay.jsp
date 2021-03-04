@@ -1,182 +1,91 @@
-<%@page import="joambuswebapp.*" %>
+<%@page import="java.net.URLDecoder"%>
+<%@ page import="joambuswebapp.*" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<!DOCTYPE html>
+    pageEncoding="UTF-8"%>
+ 
+    <%
+	String table[][][] = {
+			{
+				{"구분" ,"<i class='fa fa-user-tie'></i> 성인", "<i class='fa fa-school'></i> 청소년", "<i class='fa fa-child'></i> 어린이"},
+				{"<i class='fa fa-money-bill-alt'></i> 현금" ,"2900", "2000", "2000"},
+				{"<i class='fa fa-credit-card'></i> 카드" ,"2800", "1960", "1960"},
+				{"<i class='fa fa-sun'></i> 조조(카드)" ,"2400", "1680", "1680"}
+			},
+			{
+				{"구분" ,"<i class='fa fa-user-tie'></i> 성인", "<i class='fa fa-school'></i> 청소년", "<i class='fa fa-child'></i> 어린이"},
+				{"<i class='fa fa-money-bill-alt'></i> 현금" ,"1500", "1100", "800"},
+				{"<i class='fa fa-credit-card'></i> 카드" ,"1450", "1010", "730"},
+				{"<i class='fa fa-sun'></i> 조조(카드)" ,"1250", "870", "630"}
+			},
+			{
+				{"구분" ,"<i class='fa fa-user-tie'></i> 성인", "<i class='fa fa-school'></i> 청소년", "<i class='fa fa-child'></i> 어린이"},
+				{"<i class='fa fa-money-bill-alt'></i> 현금" ,"1400", "1000", "700"},
+				{"<i class='fa fa-credit-card'></i> 카드" ,"1350", "950", "680"},
+				{"<i class='fa fa-sun'></i> 조조(카드)" ,"-", "-", "-"}
+			}
+	};
+    String colors[] = {"red", "green", "yellow"};
+    String buses[] = {"광역버스", "일반시내버스", "마을버스"};
+	%>
+
+<!DOCTYPE HTML>
+<!--
+	Story by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>조암버스</title>
-  <link rel="shortcut icon" href="/drawable/favicon.ico">
-  <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<jsp:include page="head.jsp" flush="true"></jsp:include>
+	<body class="is-preload"  >
 
-    <!-- Custom styles for this template -->
-    <link href="css/scrolling-nav.css" rel="stylesheet">
-<style id="jsbin-css">
-@import url(//fonts.googleapis.com/earlyaccess/jejugothic.css);
+		<!-- Wrapper -->
+			<div id="wrapper" class="divided">
 
-body {
-	font-family: 'Jeju Gothic', sans-serif;
-	color: #333333;
-	background-color:#192231;
-	font-size: 10pt;
-	margin:0px;
-	line-height: 2.5em;
-}
-.list-group-item{
-	width: 100%;
-	height: 54px;
-	text-align: center;
-}
-table{
-width:100%;
-padding:0px;
-}
-td {
-	width: 150px;
-	text-align: center;
-}
-/*css로는 스타일일 일괄적으로 정할 수 있다*/
-#stit {
-	font-size: 16pt;
-}
+				<!-- One -->
+					<section class="banner style1 orient-right content-align-left image-position-left fullscreen onload-image-fade-in onload-content-fade-right">
+											
+						<div class="content content-new" id="c1"  >
+						<%for(int n = 0 ; n < 3; n++){ %>
+							<h3 class=' routenm bg-<%=colors[n] %>' style='display:inline ; width:180px;'><%=buses[n]%></h3>
+							<div class="table-wrapper">
+								<table class="alt">
+									<thead>
+										<tr>
+										<%for(int j = 0 ; j < 4; j++){ %>
+											<th><%=table[n][0][j] %></th>
+										<%} %>
+										</tr>
+									</thead>
+									<tbody>
+										<%for(int i = 1 ; i <= 3; i++){ %>
+										<tr>
+											<%for(int j = 0 ; j < 4; j++){ %>
+											<td><%=table[n][i][j] %></td>
+											<%} %>
+										</tr>
+										<%} %>
+									</tbody>
+								</table>
+							</div>
+							<hr>
+							<%} %>
+						</div>
+						
+						<div class="image item-center image-new" id="c_left" style="background-color: #fee9d4; text-align:left">
+							<div class="content"  >
+								<h1><a class="title-color-dark" href="/main" >조암버스</a></h1>
+								<br>
+								<h3 class="title-color-dark">버스 요금 안내</h3>
+							</div>
+						</div>
+					</section>
 
-header {  
-	margin-top:20px;  
-	padding-top:0px;  
-	padding-bottom: 5px;  
-	padding-left: 7px;  
-    font-size: 100%;  
-	height:32px;  
-	line-height: 2.5em; 
-	background-color: #F7E7D6;  
-	color:#ec6778;  
-} 
+				<!-- Footer -->
+				<jsp:include page="footer.jsp" flush="true"></jsp:include>
 
-</style>
-</head>
-<body>
-	<nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #985e6d;" id="mainNav">
-      <div class="container">
-        <a class="navbar-brand js-scroll-trigger" href="/" >조암버스</a>
-        <p style="text-align:center; color:white; font-size:121%;margin-bottom:0;margin-right:75px;">버스요금표</p>
-	    <div class="" id="navbarSupportedContent"></div>
-      </div>
-    </nav>  
-	<div class="container" style="position: static;padding-top:72px">
-	
-	<header id=header><p>광역/직행버스(빨강)</p></header>
-	<a class='list-group-item list-group-item-action' >
-	<table  border=0 align="center">
-		<tr>
-			<td>구분</td>
-			<td>성인</td>
-			<td>청소년</td>
-			<td>어린이</td>
-		</tr>
-	</table></a>
-	<a class='list-group-item list-group-item-action' ><table  border=0 align="center">
-		<tr>
-			<td>현금</td>
-			<td>2900</td>
-			<td>2000</td>
-			<td>2000</td>
-		</tr>
-	</table></a>
-	<a class='list-group-item list-group-item-action' ><table  border=0 align="center">
-		<tr>
-			<td>카드</td>
-			<td>2800</td>
-			<td>1960</td>
-			<td>1960</td>
-		</tr>
-	</table></a>
-	<a class='list-group-item list-group-item-action' ><table  border=0 align="center">
-		<tr>
-			<td>조조(카드)</td>
-			<td>2400</td>
-			<td>1560</td>
-			<td>1560</td>
-		</tr>
-	</table></a>
-	
-	<header id=header><p>시내버스(초록)</p></header>
-	<a class='list-group-item list-group-item-action' >
-	<table  border=0 align="center">
-		<tr>
-			<td>구분</td>
-			<td>성인</td>
-			<td>청소년</td>
-			<td>어린이</td>
-		</tr>
-	</table></a>
-	<a class='list-group-item list-group-item-action' ><table  border=0 align="center">
-		<tr>
-			<td>현금</td>
-			<td>1500</td>
-			<td>1100</td>
-			<td>800</td>
-		</tr>
-	</table></a>
-	<a class='list-group-item list-group-item-action' ><table  border=0 align="center">
-		<tr>
-			<td>카드</td>
-			<td>1450</td>
-			<td>1010</td>
-			<td>730</td>
-		</tr>
-	</table></a>
-	<a class='list-group-item list-group-item-action' ><table  border=0 align="center">
-		<tr>
-			<td>조조(카드)</td>
-			<td>1250</td>
-			<td>810</td>
-			<td>530</td>
-		</tr>
-	</table></a>
-	
-	<header id=header><p>마을버스(노랑)</p></header>
-	<a class='list-group-item list-group-item-action' >
-	<table  border=0 align="center">
-		<tr>
-			<td>구분</td>
-			<td>성인</td>
-			<td>청소년</td>
-			<td>어린이</td>
-		</tr>
-	</table></a>
-	<a class='list-group-item list-group-item-action' ><table  border=0 align="center">
-		<tr>
-			<td>현금</td>
-			<td>1400</td>
-			<td>1000</td>
-			<td>700</td>
-		</tr>
-		
-	</table></a>
-	
-	<a class='list-group-item list-group-item-action' ><table  border=0 align="center">
-		<tr>
-			<td>카드</td>
-			<td>1350</td>
-			<td>950</td>
-			<td>680</td>
-		</tr>
-	</table></a>
-	
-		
-	</div>
-	<%=StaticValue.AD%>
-	
- <!-- Bootstrap core JavaScript -->
- <script src="vendor/jquery/jquery.min.js"></script>
- <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
- <!-- Plugin JavaScript -->
- <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
- <!-- Custom JavaScript for this theme -->
- <script src="js/scrolling-nav.js"></script>
- </body>
+			</div>
+			
+			<!-- Scripts -->
+			<jsp:include page="js.jsp" flush="true"></jsp:include>
+	</body>
 </html>

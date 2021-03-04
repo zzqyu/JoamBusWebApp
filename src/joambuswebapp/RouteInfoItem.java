@@ -18,6 +18,8 @@ public class RouteInfoItem {
 	private String startStationName; // ���� ������ �̸�
 	private String upFirstTime;// ���� ù�� �ð�
 	private String upLastTime;// ���� ���� �ð�
+	private String peekAlloc;
+	private String nPeekAlloc;
 
 	public String getCompanyName() {
 		return companyName;
@@ -96,7 +98,7 @@ public class RouteInfoItem {
 			String startStationId,
 			String startStationName,
 			String upFirstTime,
-			String upLastTime) {
+			String upLastTime, String peekAlloc, String nPeekAlloc) {
 		this.companyName = companyName;
 		this.companyTel = companyTel;
 		this.downFirstTime = downFirstTime;
@@ -112,6 +114,8 @@ public class RouteInfoItem {
 		this.startStationName = startStationName;
 		this.upFirstTime = upFirstTime;
 		this.upLastTime = upLastTime;
+		this.peekAlloc = peekAlloc;
+		this.nPeekAlloc = nPeekAlloc;
 	}
 
 	@Override
@@ -132,4 +136,13 @@ public class RouteInfoItem {
 		String s = routeId;
 		return s.hashCode();
 	}
+
+	public String getPeekAlloc() {
+		return peekAlloc;
+	}
+
+	public String getnPeekAlloc() {
+		return nPeekAlloc;
+	}
+
 }

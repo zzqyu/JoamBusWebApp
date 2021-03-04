@@ -1,65 +1,52 @@
-<%@page import="joambuswebapp.*" %>
+<%@page import="java.net.URLDecoder"%>
+<%@ page import="joambuswebapp.*" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<!DOCTYPE html>
+    pageEncoding="UTF-8"%>
+
+<!DOCTYPE HTML>
+<!--
+	Story by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>조암버스</title>
-  <link rel="shortcut icon" href="/drawable/favicon.ico">
-  <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<jsp:include page="head.jsp" flush="true"></jsp:include>
+	<body class="is-preload"  >
 
-    <!-- Custom styles for this template -->
-    <link href="css/scrolling-nav.css" rel="stylesheet">
-<style>
-@import url(//fonts.googleapis.com/earlyaccess/jejugothic.css);
-body {
- font-family: 'Jeju Gothic', sans-serif;
- background-color:#192231;
-	color:#fff;
-	line-height: 2.5em;
-}
+		<!-- Wrapper -->
+			<div id="wrapper" class="divided">
 
-</style>
+				<!-- One -->
+					<section class="banner style1 orient-right content-align-left image-position-left fullscreen onload-image-fade-in onload-content-fade-right">
+											
+						<div class="content content-new" id="c1"  >
+							<h5>제작자 : 김정규</h5><br>
+							<h5><a href="https://www.facebook.com/joambusapp/" ><i class="icon brands style fa-facebook-f"></i><span class="label"> 조암버스 페이스북</span></a></h5><br>
+							<h5><a href="mailto:wjdrb0626@naver.com" class="fa fa-envelope"><span class="label"> Email: wjdrb0626@naver.com</span></a></h5><br>
+							<h5>본 홈페이지는 개인이 만든 홈페이지로 조암버스터미널과 경진여객과 관계가 없습니다.</h5><br>
+							<h5><u>사용 플랫폼 및 API</u></h5>
+							<h5>&ensp;&ensp;* 경기도 버스정보시스템(GBIS) API</h5>
+							<h5>&ensp;&ensp;* <i class="fa fa-java"></i> Java 15 (Language)</h5>
+							<h5>&ensp;&ensp;* Apache Tomcat® 9 (Web Server)</h5>
+							<h5>&ensp;&ensp;* <i class="fa fa-microsoft"></i> Microsoft Azure (Web Server)</h5>
+							<h5>&ensp;&ensp;* <i class="fa fa-database"></i> MySQL (Database)</h5>
+						</div>
+						
+						<div class="image item-center image-new" id="c_left" style="background-color: #fee9d4; text-align:left">
+							<div class="content"  >
+								<h1><a class="title-color-dark" href="/main" >조암버스</a></h1>
+								<br>
+								<h3 class="title-color-dark">홈페이지 안내</h3>
+							</div>
+						</div>
+					</section>
 
-</head>
-<body>
-<!-- Navigation -->
-   
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #985e6d;" id="mainNav">
-      <div class="container">
-        <a class="navbar-brand js-scroll-trigger" href="/" >조암버스</a>
-        <p style="text-align:center; color:white; font-size:121%;margin-bottom:0;margin-right:0;"\>홈페이지 정보</p>
-        <div class="" id="navbarSupportedContent"></div>
-      </div>
-    </nav>    
-    
-<div class="container" style="position: static;padding-top:72px">
-	<ul>
-		<li>제작자 : 김정규</li>
-		<li><a href="https://www.facebook.com/joambusapp/">조암버스 페이스북 페이지</a></li>
-		<li>본 홈페이지는 개인이 만든 홈페이지로 조암버스터미널과 경진여객과 관계가 없습니다.</li>
-		<li><u>사용 플랫폼 및 API</u></li>
-		<li>&ensp;&ensp;* 경기도 버스정보시스템(GBIS) API</li>
-		<li>&ensp;&ensp;* Java 11 (Language)</li>
-		<li>&ensp;&ensp;* Apache Tomcat® 9 (Web Server)</li>
-		<li>&ensp;&ensp;* Microsoft Azure (Web Server)</li>
-		<li>&ensp;&ensp;* Aws (Database Server)</li>
-		<li>&ensp;&ensp;* MySQL (Database)</li>
-	</ul>
-</div>
-<%=StaticValue.AD%>
-	
- <!-- Bootstrap core JavaScript -->
- <script src="vendor/jquery/jquery.min.js"></script>
- <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+				<!-- Footer -->
+				<jsp:include page="footer.jsp" flush="true"></jsp:include>
 
- <!-- Plugin JavaScript -->
- <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
- <!-- Custom JavaScript for this theme -->
- <script src="js/scrolling-nav.js"></script>
- </body>
+			</div>
+			
+			<!-- Scripts -->
+			<jsp:include page="js.jsp" flush="true"></jsp:include>
+	</body>
 </html>

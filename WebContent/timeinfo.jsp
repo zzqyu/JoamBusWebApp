@@ -7,7 +7,7 @@
 	pageEncoding="UTF-8"%>
 
 <%
-	response.setCharacterEncoding("utf-8");
+response.setCharacterEncoding("utf-8");
 	String routeId = request.getParameter("routeId");
 	String tableNo = request.getParameter("tableNo");
 	String title = request.getParameter("title");	

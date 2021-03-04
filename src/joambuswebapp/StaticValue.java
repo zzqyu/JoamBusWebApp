@@ -532,6 +532,8 @@ public class StaticValue {
 				String startStationName="";
 				String upFirstTime="";
 				String upLastTime="";
+				String peekAlloc ="";
+				String nPeekAlloc ="";
 			
 				for (Node node = descNodes.item(i).getFirstChild(); node != null; node = node.getNextSibling()) { // 첫번째 자식을
 					switch(node.getNodeName()) {
@@ -553,7 +555,7 @@ public class StaticValue {
 					}
 	
 				}
-				result.add(new RouteInfoItem(companyName, companyTel, downFirstTime, downLastTime, endMobileNo, endStationId, endStationName, routeId, routeName, routeTypeCd, startMobileNo, startStationId, startStationName, upFirstTime, upLastTime));
+				result.add(new RouteInfoItem(companyName, companyTel, downFirstTime, downLastTime, endMobileNo, endStationId, endStationName, routeId, routeName, routeTypeCd, startMobileNo, startStationId, startStationName, upFirstTime, upLastTime,peekAlloc, nPeekAlloc));
 			}
 		}
 		result.sort((x, y) -> new Float (Float.parseFloat(x.getRouteName().replace('-', '.').replaceAll("[^0-9.]", "")))

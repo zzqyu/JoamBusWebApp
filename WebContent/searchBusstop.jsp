@@ -26,20 +26,22 @@
 							"src='drawable/bus_stop.PNG'></td>"+
 						"<td id='s_name'>"+s[1]+"</td>"+
 					"</tr><tr><td id='s_mbno'>"+s[2]+"("+s[3]+")</td></tr></tbody></table></a>";
-			return answer;
+		String html="<a class='list-group-item list-group-item-action' href='/stationinfo.jsp?stationId="+s[0]+"&stationMbId="+s[2]+"&stationName="+s[1]+"'>"+
+    			"<i></i>"+
+    			"<h4>"+s[1]+"</h4>";
+    			html+="<h5>"+s[2]+"("+s[3]+")</h5></a>";
+    	
+			return html;
     }
 %>
 <%
 //검색결과가 있을 때 실행
 if(!keyword.toString().equals("null")){%>
-
-<div id="result" class="bus_List">
-	<p class="lead text-light"> <%=keyword%> 검색 결과 </p>
-	<div class="list-group">
-		<%
-       	for(String[] s: result)out.print(stationItemHtml(s));
-		%>
-	</div>
+<div id="result" class="list-group">
+    <h3 class="title-color-dark"><%=keyword%> 검색 결과</h3>
+	<%
+	for(String[] s: result)out.print(stationItemHtml(s));
+	%>
 </div>
 <%} %>
 	
