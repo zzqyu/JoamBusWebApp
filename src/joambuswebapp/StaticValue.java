@@ -54,8 +54,9 @@ public class StaticValue {
 	public final static String URL_GET_BUS_STATION_ARRIVE_LIST = "/busarrivalservice/station";
 	public final static String URL_GET_STATION_LIST = "/busstationservice";
 	public final static String PUBLIC_SERVICE_KEY = "?serviceKey=1234567890";
+	public final static String TEMP_SERVICE_KEY = "?serviceKey=1122334455";
 	public final static String PRIVATE_SERVICE_KEY = "?serviceKey=zRuxSFejoJKPbOZdUuxyIUWJF7R56lxvA5LbRwxQWj8IVxCG2F6aYImQvUJIdzvjM3EDvvYQfrQyIirNaYWkqA%3D%3D";
-	public final static String SERVICE_KEY = PRIVATE_SERVICE_KEY;
+	public final static String SERVICE_KEY = TEMP_SERVICE_KEY;
 	public final static String SERVER_URL = "https://joambusapp.azurewebsites.net";
     public final static String SERVER_URL_TIME = "/routetime";
     public final static String SERVER_URL_APP = "/appfile";
