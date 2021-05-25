@@ -1,6 +1,8 @@
 ﻿package joambuswebapp;
 
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,38 +15,35 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.TimeZone;
+
+import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
 public class DBManager {
 	static String ENCORD = "UTF-8";
     //static String DB_NAME = "joambusdb";
 	//127.0.0.1:50344
 	//본 서버
-    static String SQL_URL = "jdbc:mysql://127.0.0.1:50589/";
+    static String SQL_URL = "jdbc:mysql://139.162.72.92:3306/";
 
 	//예비 서버
 	//static String SQL_URL = "jdbc:mysql://127.0.0.1:55863/";
 	
 	//로컬 서버
 	//static String SQL_URL = "jdbc:mysql://127.0.0.1:3306/";
-    static String SQL_CLASS_NAME = "com.mysql.jdbc.Driver";
 
-    private Connection conn;
+    private Connection conn = null;
     private Statement stmt = null;
     
 	public DBManager(String dbName) {
 		
         try {
-            Class.forName(SQL_CLASS_NAME);
             //sql db에 연결
-            //conn = DriverManager.getConnection(SQL_URL+dbName , "root", "005410");
-            conn = DriverManager.getConnection(SQL_URL+dbName , "azure", "6#vWHD_$");
+            conn = MySQLJDBCUtil.getConnection(conn);
             System.out.println("DB 연결 완료");
             //sql문을 쓰기 위해 객체 생성
             stmt = conn.createStatement();
-            //ResultSet srs = stmt.executeQuery("show tables");
-            //while (srs.next()) 
-            //	System.out.println(srs.getString("Tables_in_busarrivaldb"));
         } catch (ClassNotFoundException e) {
             System.out.println("JDBC 드라이버 로드 에러");
             e.printStackTrace();
@@ -395,6 +394,54 @@ public class DBManager {
         }
 		return answer;
 	}
+}
+
+class MySQLJDBCUtil {
+
+    /**
+     * Get database connection
+     *
+     * @return a Connection object
+     * @throws SQLException
+     * @throws ClassNotFoundException 
+     */
+	static Connection getConnection(Connection conn) throws SQLException, ClassNotFoundException {
+		if(conn!=null)return conn;
+        conn = null;
+
+        try {
+
+            // load the properties file
+            Properties pros = new Properties();
+            pros.load(MySQLJDBCUtil.class.getClassLoader().getResourceAsStream("info.properties"));
+            
+            StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
+            encryptor.setPassword("password");
+    	    encryptor.setAlgorithm("PBEWITHMD5ANDDES"); 
+    	    
+            // assign db parameters
+            String driverName = pros.getProperty("db.driverName");
+            String url = pros.getProperty("db.url");
+            String user = pros.getProperty("db.id");
+            String password = pros.getProperty("db.pwd");
+            
+            url = encryptor.decrypt(url);
+            user = encryptor.decrypt(user);
+            password = encryptor.decrypt(password);
+            
+            Class.forName(driverName);
+            
+            // create a connection to the database
+            conn = DriverManager.getConnection(url, user, password);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            String path = System.getProperty("user.dir");
+            System.out.println("Working Directory = " + path);
+            
+        }
+        return conn;
+    }
+
 }
 
 
