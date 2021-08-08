@@ -1,9 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="joambuswebapp.*" %>
 
 <!DOCTYPE html>
 <!-- Footer -->
 <footer class="wrapper style1 align-center">
+	<%=StaticValue.AD%>
 	<div class="inner">
 		<ul class="icons">
 			<li><a href="https://www.facebook.com/joambusapp/" class="icon brands style2 fa-facebook-f"><span class="label">Facebook</span></a></li>
@@ -12,4 +14,6 @@
 		</ul>
 		<p>&copy; Untitled. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 	</div>
+	<p>.</p>
+	<p>.</p>
 </footer>
