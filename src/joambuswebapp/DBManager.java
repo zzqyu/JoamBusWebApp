@@ -20,6 +20,8 @@ import java.util.TimeZone;
 
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class DBManager {
 	static String ENCORD = "UTF-8";
     //static String DB_NAME = "joambusdb";
@@ -120,6 +122,22 @@ public class DBManager {
 			break;
     	}
 		return answer;
+	}
+	
+	public ArrayList<HashMap<String,Object>> convertResultSetToArrayList(ResultSet rs) throws SQLException {
+	    ResultSetMetaData md = rs.getMetaData();
+	    int columns = md.getColumnCount();
+	    ArrayList<HashMap<String,Object>> list = new ArrayList<HashMap<String,Object>>();
+	 
+	    while(rs.next()) {
+	        HashMap<String,Object> row = new HashMap<String, Object>(columns);
+	        for(int i=1; i<=columns; ++i) {
+	            row.put(md.getColumnName(i).toLowerCase(), rs.getObject(i));
+	        }
+	        list.add(row);
+	    }
+	 
+	    return list;
 	}
 	
 	public int haveTimeType(int id) throws SQLException, UnsupportedEncodingException {
@@ -284,6 +302,41 @@ public class DBManager {
         }
 		return answer;
 	}
+
+	public ArrayList<String> getStationInfo(String stationId)
+			throws SQLException, UnsupportedEncodingException {
+		ArrayList<String> answer = new ArrayList<>();
+		String sql = "SELECT * FROM joambus.station WHERE STATION_ID=\"" + stationId + "\";";
+		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
+		while(rs.next()){
+        	for(int i=0; i<9; i++)
+        		answer.add(rs.getString(i+1));
+        }
+		return answer;
+	}
+	
+	public ArrayList<StationRouteInfo> getRoutesOfStation(String stationId)
+			throws SQLException, UnsupportedEncodingException {
+		
+		ArrayList<StationRouteInfo> answer = new ArrayList<>();
+		
+		String sql = "SELECT CASE rs.UPDOWN WHEN 'Y' THEN r.ED_STA_NM ELSE r.ST_STA_NM END as 'DIRECT',\r\n"
+				+ "					rs.STA_ORDER, rs.UPDOWN, \r\n"
+				+ "					r.*\r\n"
+				+ "					FROM joambus.routestation as rs, joambus.route as r \r\n"
+				+ "					WHERE rs.STATION_ID = '" + stationId + "' and rs.ROUTE_ID = r.ROUTE_ID;";
+		
+		ResultSet rs = stmt.executeQuery(sql.toUpperCase());
+		ArrayList<HashMap<String,Object>> rsMaps = convertResultSetToArrayList(rs);
+
+		ObjectMapper mapper = new ObjectMapper(); 
+		
+		for(HashMap<String,Object> map: rsMaps) {
+			answer.add(mapper.convertValue(map, StationRouteInfo.class));
+		}		
+		
+		return answer;
+	}
 	
 	public void routeInsertAndUpdate(String values) {
 		//INSERT INTO table_name VALUES (value1, value2, value3,...)
@@ -308,7 +361,7 @@ public class DBManager {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-	}
+	}	
 	//정류장 노선목록 마을버스 추가
 	public ArrayList<String> localRouteSelectAtStation(String stationId)throws SQLException {
 		//SELECT ROUTE_ID FROM joambus.routestation as rs where STATION_ID = 233001517 and EXISTS (SELECT ROUTE_ID FROM joambus.route as r where IS_ONEWAY IS NOT NULL and ROUTE_TP=30 and r.ROUTE_ID=rs.ROUTE_ID);
@@ -441,7 +494,8 @@ class MySQLJDBCUtil {
         }
         return conn;
     }
-
+	
+	
 }
 
 

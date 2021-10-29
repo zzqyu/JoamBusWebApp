@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
@@ -24,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -419,6 +423,7 @@ public class StaticValue {
 	public static ArrayList<String> stopByRouteList(String stationId) {
 		ArrayList<String> routeList = null;
 		String u = StaticValue.URL + StaticValue.URL_GET_STATION_ROUTE_LIST + StaticValue.SERVICE_KEY + "&stationId="+stationId;
+		System.out.println("URL: " + u);
 		try {
 			routeList = new ArrayList<String>();
 		
