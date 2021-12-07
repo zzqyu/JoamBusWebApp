@@ -120,7 +120,6 @@ public class RouteInfoItem {
 
 	@Override
 	public boolean equals(Object obj) {
-		// TODO Auto-generated method stub
 		boolean sameSame = false;
 
 		if (obj != null && obj instanceof RouteInfoItem) {

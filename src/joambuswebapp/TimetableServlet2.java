@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet("/TimetableServlet2")
 public class TimetableServlet2 extends HttpServlet {
-	private HttpServletRequest request; 
 	private static final long serialVersionUID = 1L;
        
     /**
@@ -28,12 +27,10 @@ public class TimetableServlet2 extends HttpServlet {
      */
     public TimetableServlet2() {
         super();
-        // TODO Auto-generated constructor stub
     }
     protected void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// 1. 파라미터로 전송된 값을 얻어오기.
-    	this.request = request;
 		response.setCharacterEncoding("utf-8");
 		String stationId = request.getParameter("stationId");
 		String title = request.getParameter("title");	

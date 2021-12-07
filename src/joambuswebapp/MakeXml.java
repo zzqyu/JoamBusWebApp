@@ -25,7 +25,6 @@ public class MakeXml {
 		routeList = StaticValue.routeLocalization();
 		saveFileInServerRouteId("appfile/", "routeList", routeList);
 		for(String routeId: routeList) {
-			ArrayList<BusRouteStation> rs = BusRouteStation.getRouteStationList(routeId);
 			saveFileInServerBusRouteStation("routestation/", routeId);
 		}
 	}

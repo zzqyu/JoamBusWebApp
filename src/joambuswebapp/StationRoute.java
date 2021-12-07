@@ -22,7 +22,6 @@ public class StationRoute {
 	public String getStaOrder() {return staOrder;}
 	@Override
 	public boolean equals(Object obj) {
-		// TODO Auto-generated method stub
 		boolean sameSame = false;
 
 	    if (obj != null && obj instanceof StationRoute){

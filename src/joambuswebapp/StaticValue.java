@@ -12,11 +12,7 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
@@ -156,7 +152,6 @@ public class StaticValue {
 				}
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         return 1;
@@ -186,7 +181,6 @@ public class StaticValue {
 			}
 			return result;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -372,10 +366,8 @@ public class StaticValue {
 			
 			
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return answer;
@@ -406,7 +398,6 @@ public class StaticValue {
 		
 		
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 			return null;
 		}
@@ -419,6 +410,7 @@ public class StaticValue {
 	public static ArrayList<String> stopByRouteList(String stationId) {
 		ArrayList<String> routeList = null;
 		String u = StaticValue.URL + StaticValue.URL_GET_STATION_ROUTE_LIST + StaticValue.SERVICE_KEY + "&stationId="+stationId;
+		System.out.println("URL: " + u);
 		try {
 			routeList = new ArrayList<String>();
 		
@@ -438,7 +430,6 @@ public class StaticValue {
 					routeList.add(routeId);
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return routeList;

@@ -1,3 +1,5 @@
+<%@page import="java.util.stream.Collectors"%>
+<%@page import="java.util.StringTokenizer"%>
 <%@page import="java.time.DayOfWeek"%>
 <%@page import="java.util.Collections"%>
 <%@page import="java.time.LocalTime"%>
@@ -9,17 +11,27 @@
 <%@page import="java.util.Arrays"%>
 <%@page import="org.w3c.dom.*"%>
 <%@page import="java.net.*"%>
+<%@page import="joambuswebapp.DBManager"%>
 <%@page import="java.util.ArrayList"%>
+<%@page import="java.util.List" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
 <%
-response.setCharacterEncoding("utf-8");
+	response.setCharacterEncoding("utf-8");
 	
 	String stationId = request.getParameter("stationId");//정류장 ID
 	String stationMbId = request.getParameter("stationMbId");//정류장 모바일ID
 	//String stationName = new String(request.getParameter("stationName").getBytes("8859_1"), "UTF-8"); //정류장 이름
 	String stationName = new String(request.getParameter("stationName")); //정류장 이름
+	
+	DBManager dbm = new DBManager("JOAMBUS");
+	
+	ArrayList<String> stationInfo = dbm.getStationInfo(stationId);
+	boolean isAndroid = request.getHeader ("user-agent").contains("android");
+	
+	String urlMap = isAndroid?("geo:0,0?q=" + stationInfo.get(5) + "," + stationInfo.get(4) + "(" + stationInfo.get(1) + ")")
+			:("https://www.google.com/maps/place/" + stationInfo.get(5) + "+" + stationInfo.get(4));
 	
 
 	String holi = request.getParameter("holi");	
@@ -33,9 +45,9 @@ response.setCharacterEncoding("utf-8");
 	}
 
 
-	DBManager dbm = new DBManager("JOAMBUS");
+	
 	String routeId, routeTypeCd, routeName, startStationName, middleStationName, endStationName, direction, isInDB="";
-	ArrayList<String> arriveRouteIds= new ArrayList<String>();
+	ArrayList<BusArriveStation> routeList = StaticValue.getBusArriveStation(stationId);
 	
 	
 	TimeZone kst = TimeZone.getTimeZone ("JST"); 
@@ -85,13 +97,12 @@ response.setCharacterEncoding("utf-8");
 					<section class="banner style1 orient-right content-align-left image-position-left fullscreen onload-image-fade-in onload-content-fade-right">
 						<div class="content content-new" id="c1" >
 							<div class="list-group">
+								<%if(routeList.size()>0){%>
 							    <h3 class="title-color-dark">운행중인 노선</h3>
-								<%
+								<%}
 									try{
-										ArrayList<BusArriveStation> routeList = StaticValue.getBusArriveStation(stationId);
 										Collections.sort(routeList, (x, y)->(Integer.compare(Integer.parseInt(x.getPredictTime1()) , Integer.parseInt(y.getPredictTime1()))));
 							        	for(BusArriveStation routeItem: routeList){
-							        		arriveRouteIds.add(routeItem.getRouteId());
 											routeId = routeItem.getRouteId();
 											String[] routeInfo = dbm.routeInfo(Integer.parseInt(routeId));
 											if(routeInfo==null) { 
@@ -117,45 +128,48 @@ response.setCharacterEncoding("utf-8");
 									// TODO: handle exception
 									}
 								%>
+								<%if(routeList.size()>0){%>
 								<hr>
-							    <h3 class="title-color-dark">노선 목록</h3>
-							    <%
+							    <%}
 									//정류장을 경유하는 전체 노선 중 위 도착 예정인 버스 제외하고 출력
-									
 									try {
 										//API를 통해 정류장을 경유하는 전체 노선ID 목록 받기
-										ArrayList<String> gbisRouteList = StaticValue.stopByRouteList(stationId);
+										ArrayList<StationRouteInfo> rss = dbm.getRoutesOfStation(stationId);
+										
+										System.out.println("[RSS]: " + rss.size());
+										
+										for(StationRouteInfo item: rss)
+											System.out.println("[RSS]: " + item.getRoute_id());
+										
 										//전체 노선 목록에서 도착 예정 노선을 제거한다
-										for(String arriveRouteId: arriveRouteIds) {
-											gbisRouteList.remove(arriveRouteId);
+
+										ArrayList<BusArriveStation> filterList = new ArrayList<>();
+										for(StationRouteInfo rs: rss){
+											List<BusArriveStation> temp = routeList.stream()
+											.filter(route -> rs.getRoute_id().equals(route.getRouteId()) 
+															 && rs.getSta_order().equals(route.getStaOrder()))
+											.collect(Collectors.toList());
+											filterList.addAll(temp);
 										}
-										//50-1추가
-										gbisRouteList.addAll(dbm.localRouteSelectAtStation(stationId));
+										rss.removeIf(rs -> filterList.stream()
+										.map(BusArriveStation::getRouteId)
+										.anyMatch(rs.getRoute_id()::equals));
+										if(rss.size()>0){
+											%>
+											<h3 class="title-color-dark">노선 목록</h3>
+											<%
+										}
 										//리스트로 표출하기
-										for(String gbisRouteId: gbisRouteList) {
-											String[] routeInfo = dbm.routeInfo(Integer.parseInt(gbisRouteId));
-											if(routeInfo==null) { 
-												System.out.println("없는 노선");
-												routeInfo = dbm.gbisRouteInfo(Integer.parseInt(gbisRouteId));
-												if(routeInfo==null){
-													try {
-														ArrayList<String> ri = new ArrayList<String>();
-														ri.add(gbisRouteId+"");
-														RouteInfoItem ii = StaticValue.getRouteInfoItem(ri, request).get(0);
-														routeInfo = new String[]{ii.getRouteTypeCd(), ii.getRouteName(), 
-																ii.getStartStationName(), ii.getEndStationName(), 
-																ii.getUpFirstTime(), ii.getDownFirstTime(),
-																ii.getUpLastTime(), ii.getDownLastTime()};
-													} catch (Exception e) {
-														e.printStackTrace();
-													}
-												}
-											}
-											out.print(routeItemHtml(routeInfo, gbisRouteId, null));
+										for(StationRouteInfo sri: rss) {
+											String[] routeInfo = new String[]{sri.getRoute_tp(), sri.getRoute_nm(), 
+													sri.getSt_sta_nm(), sri.getEd_sta_nm(), 
+													sri.getUp_first_time(), sri.getDown_first_time(),
+													sri.getUp_last_time(), sri.getDown_last_time()};
+											out.print(routeItemHtml(routeInfo, sri.getRoute_id(), null));
 										}
 										
 									}catch (Exception e) {
-									// TODO: handle exception
+										System.out.println("[RSS]: " + e.fillInStackTrace());
 									}
 								
 								
@@ -167,7 +181,9 @@ response.setCharacterEncoding("utf-8");
 						<div class="image item-center image-new" id="c_left" style=" background-color: #fee9d4; text-align:left">
 							<div class="content" style="width: 100%;padding:1.5rem;" >
 								<h2><a class="title-color-dark" href="/main" >조암버스</a></h2>
-								<h4 class="title-color-dark"><%=stationName %><%if(stationMbId.contains("NULL")){%>(<%=stationMbId %>)<%} %></h4>
+								<h4 class="title-color-dark"><%=stationName%><%if(!stationMbId.contains("NULL")){%>(<%=stationMbId.replace(" ", "")%>)<%} %></h4>
+								<a href="<%=urlMap%>" class="btn bnt-sm fit bt-dark no-box-shadow">정류장 위치</a>
+								
 								<%
 								int cnt = 0;
 								if(stt.size()>0){%>
